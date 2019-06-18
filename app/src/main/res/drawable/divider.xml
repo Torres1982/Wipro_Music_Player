@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <size
-        android:height="1px"
-        android:width="1px" />
+        android:height="@dimen/divider_size"
+        android:width="@dimen/divider_size" />
     <solid android:color="@color/yellow" />
 </shape>

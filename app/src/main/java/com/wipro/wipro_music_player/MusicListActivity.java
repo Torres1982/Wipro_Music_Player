@@ -42,6 +42,8 @@ public class MusicListActivity extends AppCompatActivity {
         RecyclerView recycler = findViewById(R.id.recycler_view);
         Drawable divider = ContextCompat.getDrawable(recycler.getContext(), R.drawable.divider);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recycler.getContext(), layoutManager.getOrientation());
+
+        assert divider != null;
         dividerItemDecoration.setDrawable(divider);
 
         recycler.setHasFixedSize(true);

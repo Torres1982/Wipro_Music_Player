@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <TextView
+        android:id="@+id/music_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_title_size"
+        android:text="Default Text Test"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="@dimen/margin_forty"
+        android:layout_marginBottom="@dimen/margin_twenty" />
+    <TextView
+        android:id="@+id/music_artist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_artist_size"
+        android:text="Artist Name"
+        android:gravity="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/music_title" />
+    <ImageView
+        android:id="@+id/music_main_image"
+        android:layout_width="match_parent"
+        android:layout_height="400px"
+        android:background="@color/yellow"
+        android:layout_marginTop="@dimen/margin_twenty"
+        android:layout_marginStart="@dimen/margin_sixty"
+        android:layout_marginEnd="@dimen/margin_sixty"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/music_artist" />
+
+    <ImageButton
+        android:id="@+id/button_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:src="@drawable/play_button"
+        android:contentDescription="@string/icon_description"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/music_main_image"/>
+</android.support.constraint.ConstraintLayout>
