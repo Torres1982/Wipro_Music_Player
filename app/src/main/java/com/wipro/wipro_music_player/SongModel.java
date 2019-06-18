@@ -4,6 +4,8 @@ public class SongModel {
     private String artist;
     private String title;
 
+    SongModel() {}
+
     SongModel(String artist, String title) {
         this.artist = artist;
         this.title = title;
