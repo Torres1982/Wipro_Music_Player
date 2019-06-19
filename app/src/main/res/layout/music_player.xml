@@ -29,12 +29,14 @@
 
     <ImageView
         android:id="@+id/music_main_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/height_three_hundred"
         android:layout_marginStart="@dimen/margin_sixty"
         android:layout_marginTop="@dimen/margin_twenty"
         android:layout_marginEnd="@dimen/margin_sixty"
-        android:background="@drawable/metallica"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        android:background="@drawable/music"
         android:contentDescription="@string/icon_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
