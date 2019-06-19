@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -49,6 +51,7 @@ public class MusicPlayer extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 displayToastMessage("Playing Song!");
+                animateButtonClick(playSong);
             }
         });
     }
@@ -58,6 +61,7 @@ public class MusicPlayer extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 displayToastMessage("Playing Next Song!");
+                animateButtonClick(nextSong);
             }
         });
     }
@@ -67,6 +71,7 @@ public class MusicPlayer extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 displayToastMessage("Playing Previous Song!");
+                animateButtonClick(previousSong);
             }
         });
     }
@@ -76,6 +81,7 @@ public class MusicPlayer extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 displayToastMessage("Song stopped!");
+                animateButtonClick(stopSong);
             }
         });
     }
@@ -85,6 +91,7 @@ public class MusicPlayer extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 displayToastMessage("Song Paused!");
+                animateButtonClick(pauseSong);
             }
         });
     }
@@ -92,5 +99,11 @@ public class MusicPlayer extends AppCompatActivity {
     // General Toast Message method
     private void displayToastMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    // Set Animation for Image Button clicks
+    private void animateButtonClick(ImageButton button) {
+        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
+        button.startAnimation(animation);
     }
 }
