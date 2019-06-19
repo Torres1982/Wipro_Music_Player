@@ -5,12 +5,14 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class MusicPlayer extends AppCompatActivity {
     TextView songTitle, songArtist;
     ImageButton playSong, stopSong, pauseSong, nextSong, previousSong;
+    SeekBar seekBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,7 +22,7 @@ public class MusicPlayer extends AppCompatActivity {
         Intent musicIntent = getIntent();
         String artist = musicIntent.getStringExtra("artist_name");
         String title = musicIntent.getStringExtra("song_title");
-        Toast.makeText(this, artist + " " + title, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, artist + " " + title, Toast.LENGTH_SHORT).show();
 
         songArtist = findViewById(R.id.music_artist);
         songTitle = findViewById(R.id.music_title);
@@ -29,6 +31,7 @@ public class MusicPlayer extends AppCompatActivity {
         pauseSong = findViewById(R.id.button_pause);
         nextSong = findViewById(R.id.button_next);
         previousSong = findViewById(R.id.button_previous);
+        seekBar = findViewById(R.id.seek_bar);
 
         songArtist.setText(artist);
         songTitle.setText(title);

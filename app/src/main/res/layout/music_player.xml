@@ -40,6 +40,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/music_artist" />
 
+    <SeekBar
+        android:id="@+id/seek_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_forty"
+        android:layout_marginEnd="@dimen/margin_forty"
+        android:layout_marginTop="@dimen/margin_forty"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/music_main_image" />
+
     <ImageButton
         android:id="@+id/button_previous"
         android:layout_width="wrap_content"
@@ -53,7 +64,7 @@
         app:layout_constraintEnd_toStartOf="@+id/button_play"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/music_main_image" />
+        app:layout_constraintTop_toBottomOf="@id/seek_bar" />
 
     <ImageButton
         android:id="@+id/button_play"
@@ -67,7 +78,7 @@
         app:layout_constraintEnd_toStartOf="@+id/button_stop"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/button_previous"
-        app:layout_constraintTop_toBottomOf="@+id/music_main_image" />
+        app:layout_constraintTop_toBottomOf="@+id/seek_bar" />
 
     <ImageButton
         android:id="@+id/button_stop"
@@ -81,7 +92,7 @@
         app:layout_constraintEnd_toStartOf="@+id/button_pause"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/button_play"
-        app:layout_constraintTop_toBottomOf="@+id/music_main_image" />
+        app:layout_constraintTop_toBottomOf="@+id/seek_bar" />
 
     <ImageButton
         android:id="@+id/button_pause"
@@ -95,7 +106,7 @@
         app:layout_constraintEnd_toStartOf="@+id/button_next"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/button_stop"
-        app:layout_constraintTop_toBottomOf="@id/music_main_image" />
+        app:layout_constraintTop_toBottomOf="@id/seek_bar" />
 
     <ImageButton
         android:id="@+id/button_next"
@@ -110,5 +121,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/button_pause"
-        app:layout_constraintTop_toBottomOf="@id/music_main_image" />
+        app:layout_constraintTop_toBottomOf="@id/seek_bar" />
 </android.support.constraint.ConstraintLayout>

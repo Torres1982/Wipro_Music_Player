@@ -18,7 +18,7 @@ public class SongModel {
         return title;
     }
 
-    public void setArtist(String artist) {
+    void setArtist(String artist) {
         this.artist = artist;
     }
     public void setTitle(String title) {
