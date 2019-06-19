@@ -1,51 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
+
     <TextView
         android:id="@+id/music_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/text_title_size"
-        android:text="Default Text Test"
-        android:gravity="center"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="@dimen/margin_forty"
-        android:layout_marginBottom="@dimen/margin_twenty" />
+        android:layout_marginBottom="@dimen/margin_twenty"
+        android:gravity="center"
+        android:textSize="@dimen/text_title_twenty_four"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/music_artist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/text_artist_size"
-        android:text="Artist Name"
         android:gravity="center"
-        app:layout_constraintStart_toStartOf="parent"
+        android:textSize="@dimen/text_artist_eighteen"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/music_title" />
+
     <ImageView
         android:id="@+id/music_main_image"
-        android:layout_width="match_parent"
-        android:layout_height="400px"
-        android:background="@color/yellow"
-        android:layout_marginTop="@dimen/margin_twenty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_sixty"
+        android:layout_marginTop="@dimen/margin_twenty"
         android:layout_marginEnd="@dimen/margin_sixty"
-        app:layout_constraintStart_toStartOf="parent"
+        android:background="@drawable/metallica"
+        android:contentDescription="@string/icon_description"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/music_artist" />
+
+    <ImageButton
+        android:id="@+id/button_previous"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_forty"
+        android:layout_marginStart="@dimen/margin_twenty"
+        android:background="@null"
+        android:clickable="true"
+        android:contentDescription="@string/icon_description"
+        android:src="@drawable/previous"
+        app:layout_constraintEnd_toStartOf="@+id/button_play"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/music_main_image" />
 
     <ImageButton
         android:id="@+id/button_play"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:clickable="true"
-        android:src="@drawable/play"
+        android:layout_marginTop="@dimen/margin_forty"
         android:background="@null"
+        android:clickable="true"
         android:contentDescription="@string/icon_description"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/music_main_image"/>
+        android:src="@drawable/play"
+        app:layout_constraintEnd_toStartOf="@+id/button_stop"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/button_previous"
+        app:layout_constraintTop_toBottomOf="@+id/music_main_image" />
+
+    <ImageButton
+        android:id="@+id/button_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_forty"
+        android:background="@null"
+        android:clickable="true"
+        android:contentDescription="@string/icon_description"
+        android:src="@drawable/stop"
+        app:layout_constraintEnd_toStartOf="@+id/button_pause"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/button_play"
+        app:layout_constraintTop_toBottomOf="@+id/music_main_image" />
+
+    <ImageButton
+        android:id="@+id/button_pause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_forty"
+        android:background="@null"
+        android:clickable="true"
+        android:contentDescription="@string/icon_description"
+        android:src="@drawable/pause"
+        app:layout_constraintEnd_toStartOf="@+id/button_next"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/button_stop"
+        app:layout_constraintTop_toBottomOf="@id/music_main_image" />
+
+    <ImageButton
+        android:id="@+id/button_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_forty"
+        android:layout_marginEnd="@dimen/margin_twenty"
+        android:background="@null"
+        android:clickable="true"
+        android:contentDescription="@string/icon_description"
+        android:src="@drawable/next"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/button_pause"
+        app:layout_constraintTop_toBottomOf="@id/music_main_image" />
 </android.support.constraint.ConstraintLayout>

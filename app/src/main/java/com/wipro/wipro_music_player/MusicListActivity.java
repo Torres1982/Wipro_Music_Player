@@ -25,7 +25,7 @@ public class MusicListActivity extends AppCompatActivity {
                 new SongModel("In Flames", "Battles"),
                 new SongModel("Dream Theater", "New Millenium"),
                 new SongModel("SOAD", "Toxity"),
-                new SongModel("Coma", "Better Wat"),
+                new SongModel("Coma", "Better Way"),
                 new SongModel("Megadeth", "Illusion"),
                 new SongModel("Goodsmack", "Mama"),
                 new SongModel("Ira", "Moj Dom"),

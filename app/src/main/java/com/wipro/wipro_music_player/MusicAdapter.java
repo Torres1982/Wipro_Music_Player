@@ -2,14 +2,12 @@ package com.wipro.wipro_music_player;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> {
     private SongModel [] listOfSongs;
@@ -36,11 +34,9 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
         viewHolder.linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(v.getContext(), "Clicked: " + songsList.getTitle(), Toast.LENGTH_SHORT).show();
                 Intent musicPlayerIntent = new Intent(v.getContext(), MusicPlayer.class);
                 musicPlayerIntent.putExtra("artist_name", songsList.getArtist());
                 musicPlayerIntent.putExtra("song_title", songsList.getTitle());
-                LocalBroadcastManager.getInstance(v.getContext()).sendBroadcast(musicPlayerIntent);
                 v.getContext().startActivity(musicPlayerIntent);
             }
         });
