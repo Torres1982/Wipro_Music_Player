@@ -11,8 +11,10 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wipro.wipro_music_player.util.ConverterUtility;
+
 public class MusicPlayer extends AppCompatActivity {
-    TextView songTitle, songArtist;
+    TextView songTitle, songArtist, songLength;
     ImageButton playSong, stopSong, pauseSong, nextSong, previousSong;
     SeekBar seekBar;
 
@@ -22,12 +24,17 @@ public class MusicPlayer extends AppCompatActivity {
         setContentView(R.layout.music_player);
 
         Intent musicIntent = getIntent();
-        String artist = musicIntent.getStringExtra("artist_name");
-        String title = musicIntent.getStringExtra("song_title");
+        Bundle extras = musicIntent.getExtras();
+        assert extras != null;
+        String artist = extras.getString("artist_name");
+        String title = extras.getString("song_title");
+        long length = extras.getLong("song_length");
         //Toast.makeText(this, artist + " " + title, Toast.LENGTH_SHORT).show();
+        String songDuration = ConverterUtility.convertMillisecondsToMinutesAndSeconds(length);
 
         songArtist = findViewById(R.id.music_artist);
         songTitle = findViewById(R.id.music_title);
+        songLength = findViewById(R.id.music_length);
         playSong = findViewById(R.id.button_play);
         stopSong = findViewById(R.id.button_stop);
         pauseSong = findViewById(R.id.button_pause);
@@ -37,6 +44,7 @@ public class MusicPlayer extends AppCompatActivity {
 
         songArtist.setText(artist);
         songTitle.setText(title);
+        songLength.setText(songDuration);
 
         playSong();
         playNextSong();
