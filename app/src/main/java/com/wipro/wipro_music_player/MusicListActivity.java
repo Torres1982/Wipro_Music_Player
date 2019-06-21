@@ -1,15 +1,11 @@
 package com.wipro.wipro_music_player;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,6 +14,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.wipro.wipro_music_player.util.PermissionUtility;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -32,7 +30,7 @@ public class MusicListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.songs_list);
 
-        checkStoragePermissions();
+        PermissionUtility.checkStoragePermissions(getApplicationContext(), this);
 
         //PlayerManager playerManager = new PlayerManager();
         //ArrayList<String> songsList = playerManager.findSongs(path);
@@ -122,28 +120,5 @@ public class MusicListActivity extends AppCompatActivity {
             Log.i("MUSIC_TAG", "Music List is Empty!");
         }
         return listOfSongs;
-    }
-
-    // Self-check permissions
-    @SuppressLint("ObsoleteSdkInt")
-    private void checkStoragePermissions() {
-        final String PERMISSION_TAG = "PERMISSION_TAG";
-        final String PERMISSION_MSG = "Storage Permission Accepted!";
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, PERMISSION_MSG, Toast.LENGTH_SHORT).show();
-                Log.i(PERMISSION_TAG, PERMISSION_MSG);
-            } else {
-                ActivityCompat.requestPermissions(this, new String[] {
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                        Manifest.permission.READ_EXTERNAL_STORAGE }, 1);
-                Log.i(PERMISSION_TAG,"Permission is Revoked!");
-            }
-        }
-        else {
-            Toast.makeText(this, PERMISSION_MSG, Toast.LENGTH_SHORT).show();
-            Log.i(PERMISSION_TAG, PERMISSION_MSG);
-        }
     }
 }
