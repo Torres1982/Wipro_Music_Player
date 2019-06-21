@@ -16,6 +16,9 @@ public class ConverterUtility {
     public static String convertMillisecondsToMinutesAndSeconds(long millisec) {
         long minutes = (millisec / 1000) / 60;
         long seconds = (millisec / 1000) % 60;
-        return minutes + ":" + seconds;
+        String time = minutes + ":" + seconds;
+
+        if (seconds < 10) time =  minutes + ":0" + seconds;
+        return time;
     }
 }
