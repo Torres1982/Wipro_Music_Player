@@ -1,7 +1,10 @@
 package com.wipro.wipro_music_player;
 
+import android.content.Context;
+import android.database.Cursor;
 import android.graphics.drawable.Drawable;
-import android.os.Environment;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,49 +12,44 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.widget.Toast;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class MusicListActivity extends AppCompatActivity {
+    List<SongModel> musicList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.songs_list);
 
-        String path = findPath();
-        //Toast.makeText(this,"PATH: " + path, Toast.LENGTH_SHORT).show();
-        PlayerManager playerManager = new PlayerManager();
-        ArrayList<String> songsList = playerManager.findSongs(path);
-        Log.i("MUSIC_TAG", songsList + "");
+        //PlayerManager playerManager = new PlayerManager();
+        //ArrayList<String> songsList = playerManager.findSongs(path);
+        //Log.i("MUSIC_TAG", " " + songsList);
 
-//        ArrayList<HashMap<String, String>> songsListData = new ArrayList<>(songsList);
-//        Log.i("MUSIC_TAG", songsListData + "");
+        //String songLength = ConverterUtility.convertMillisecondsToMinutesAndSeconds(764000);
+        //double songSize = ConverterUtility.convertBytesToMegabytes(4845638);
+        //Toast.makeText(this,"Song Length: " + songLength, Toast.LENGTH_SHORT).show();
+        //Log.i("MUSIC_TAG", "DURATION: " + songLength + " SIZE: " + songSize + " MB");
 
-        SongModel[] songs = new SongModel[] {
-                new SongModel("Metallica", "One"),
-                new SongModel("Nirvana", "On a Plain"),
-                new SongModel("Opeth", "Face of Melinda"),
-                new SongModel("ONA", "Znalazlam"),
-                new SongModel("Oasis", "Little by Little"),
-                new SongModel("AC/DC", "Thunderstruck"),
-                new SongModel("In Flames", "Battles"),
-                new SongModel("Dream Theater", "New Millenium"),
-                new SongModel("SOAD", "Toxity"),
-                new SongModel("Coma", "Better Way"),
-                new SongModel("Megadeth", "Illusion"),
-                new SongModel("Goodsmack", "Mama"),
-                new SongModel("Ira", "Moj Dom"),
-                new SongModel("Varius Manx", "Zabij Mnie"),
-                new SongModel("Andy James", "Dual"),
-                new SongModel("Creed", "Faceless Man"),
-                new SongModel("Luxtorpeda", "Wilki Dwa"),
-                new SongModel("Joe Satriani", "Friends"),
-                new SongModel("Filter", "Hey Man Nice Shot"),
-        };
+        musicList = getAllAudioFromDevice(this);
+        //Toast.makeText(this,"LIST: " + musicList.get(0).getArtist(), Toast.LENGTH_SHORT).show();
 
-        MusicAdapter musicAdapter = new MusicAdapter(songs);
+        List<SongModel> music = new ArrayList<>();
+
+        for (int i = 0; i < musicList.size(); i++) {
+            music.add(new SongModel(musicList.get(i).getArtist(),
+                                    musicList.get(i).getTitle(),
+                                    musicList.get(i).getPath(),
+                                    musicList.get(i).getLength(),
+                                    musicList.get(i).getSize()));
+        }
+
+        MusicAdapter musicAdapter = new MusicAdapter(music);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         RecyclerView recycler = findViewById(R.id.recycler_view);
         Drawable divider = ContextCompat.getDrawable(recycler.getContext(), R.drawable.divider);
@@ -66,31 +64,56 @@ public class MusicListActivity extends AppCompatActivity {
         recycler.setAdapter(musicAdapter);
     }
 
-    private String findPath() {
-        String path = null;
-        File sdCardFile;
-        List<String> sdCardPossiblePath = Arrays.asList("external_sd", "ext_sd", "external", "extSdCard");
+    // retrieve all the mp3 files from the External SD Card
+    public List<SongModel> getAllAudioFromDevice(final Context context) {
+        List<SongModel> listOfSongs = new ArrayList<>();
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        String [] projection = {MediaStore.Audio.AudioColumns.DATA,
+                                MediaStore.Audio.AudioColumns.TITLE,
+                                MediaStore.Audio.AudioColumns.ALBUM,
+                                MediaStore.Audio.ArtistColumns.ARTIST,
+                                MediaStore.Audio.AudioColumns.DURATION,
+                                MediaStore.Audio.AudioColumns.SIZE,
+                                MediaStore.Audio.AudioColumns.DISPLAY_NAME,
+        };
+        Cursor cursor = context.getContentResolver().query(uri, projection, null, null, null);
 
-        for (String sdPath : sdCardPossiblePath) {
-            File file = new File("/mnt/", sdPath);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                // Create a model object.
+                SongModel songModel = new SongModel();
 
-            if (file.isDirectory() && file.canWrite()) {
-                path = file.getAbsolutePath();
-                File testWritable = new File(path, "test");
+                String artist = cursor.getString(3);
+                String title = cursor.getString(1);
+                String path = cursor.getString(0);
+                long duration = cursor.getLong(4);
+                double size = cursor.getLong(5);
 
-                if (testWritable.mkdirs()) {
-                    testWritable.delete();
-                } else {
-                    path = null;
-                }
+                //String album = cursor.getString(2);
+                //String name = cursor.getString(6);
+
+                // Set data to the model object
+                songModel.setArtist(artist);
+                songModel.setTitle(title);
+                songModel.setPath(path);
+                songModel.setLength(duration);
+                songModel.setSize(size);
+
+                //Log.i("MUSIC_TAG", "ARTIST: " + artist);
+                //Log.i("MUSIC_TAG", "TITLE: " + title);
+                //Log.i("MUSIC_TAG", "DURATION: " + duration + " SIZE: " + size);
+                //Log.i("MUSIC_TAG", "PATH: " + path);
+                //Log.i("MUSIC_TAG", "ALBUM: " + album);
+                //Log.i("MUSIC_TAG", "NAME: " + name);
+
+                // Add the model object to the list
+                listOfSongs.add(songModel);
             }
-        }
-
-        if (path != null) {
-            sdCardFile = new File(path);
+            cursor.close();
         } else {
-            sdCardFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
+            Toast.makeText(this,"Music List is Empty!", Toast.LENGTH_SHORT).show();
+            Log.i("MUSIC_TAG", "Music List is Empty!");
         }
-        return sdCardFile.getAbsolutePath();
+        return listOfSongs;
     }
 }

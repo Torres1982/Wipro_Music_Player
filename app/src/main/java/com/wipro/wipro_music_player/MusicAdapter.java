@@ -1,6 +1,7 @@
 package com.wipro.wipro_music_player;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,10 +10,12 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> {
-    private SongModel [] listOfSongs;
+import java.util.List;
 
-    MusicAdapter(SongModel[] list) {
+public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> {
+    private List<SongModel> listOfSongs;
+
+    MusicAdapter(List<SongModel> list) {
         listOfSongs = list;
     }
 
@@ -27,16 +30,21 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        final SongModel songsList = listOfSongs[position];
-        viewHolder.artistTextView.setText(listOfSongs[position].getArtist());
-        viewHolder.titleTextView.setText(listOfSongs[position].getTitle());
+        final SongModel songsList = listOfSongs.get(position);
+        viewHolder.artistTextView.setText(listOfSongs.get(position).getArtist());
+        viewHolder.titleTextView.setText(listOfSongs.get(position).getTitle());
 
         viewHolder.linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Bundle extras = new Bundle();
+                extras.putString("artist_name", songsList.getArtist());
+                extras.putString("song_title", songsList.getTitle());
+                extras.putString("song_path", songsList.getPath());
+                extras.putLong("song_length", songsList.getLength());
+                extras.putDouble("song_size", songsList.getSize());
                 Intent musicPlayerIntent = new Intent(v.getContext(), MusicPlayer.class);
-                musicPlayerIntent.putExtra("artist_name", songsList.getArtist());
-                musicPlayerIntent.putExtra("song_title", songsList.getTitle());
+                musicPlayerIntent.putExtras(extras);
                 v.getContext().startActivity(musicPlayerIntent);
             }
         });
@@ -44,7 +52,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return listOfSongs.length;
+        return listOfSongs.size();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

@@ -27,18 +27,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/music_title" />
 
+    <TextView
+        android:id="@+id/music_length"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="@dimen/text_artist_eighteen"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/music_artist"/>
+
     <ImageView
         android:id="@+id/music_main_image"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/height_three_hundred"
         android:layout_marginStart="@dimen/margin_sixty"
         android:layout_marginTop="@dimen/margin_twenty"
         android:layout_marginEnd="@dimen/margin_sixty"
-        android:background="@drawable/metallica"
+        android:background="@drawable/music"
         android:contentDescription="@string/icon_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/music_artist" />
+        app:layout_constraintTop_toBottomOf="@id/music_length" />
 
     <SeekBar
         android:id="@+id/seek_bar"

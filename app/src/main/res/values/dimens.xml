@@ -4,6 +4,7 @@
     <dimen name="text_title_twenty">20sp</dimen>
     <dimen name="text_artist_eighteen">18sp</dimen>
     <dimen name="text_artist_fourteen">14sp</dimen>
+    <dimen name="height_three_hundred">300dp</dimen>
     <dimen name="margin_sixty">60dp</dimen>
     <dimen name="margin_forty">40dp</dimen>
     <dimen name="margin_twenty">20dp</dimen>
