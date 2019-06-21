@@ -1,6 +1,7 @@
 package com.wipro.wipro_music_player;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -15,8 +16,9 @@ import com.wipro.wipro_music_player.util.ConverterUtility;
 
 public class MusicPlayer extends AppCompatActivity {
     TextView songTitle, songArtist, songLength;
-    ImageButton playSong, stopSong, pauseSong, nextSong, previousSong;
+    ImageButton playSong, stopSong, nextSong, previousSong;
     SeekBar seekBar;
+    MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +39,12 @@ public class MusicPlayer extends AppCompatActivity {
         double songSizeRounded = ConverterUtility.roundDoubleValue(songSize, 2);
         Toast.makeText(this, "SIZE: " + songSizeRounded + " MB", Toast.LENGTH_SHORT).show();
 
+        mediaPlayer = new MediaPlayer();
         songArtist = findViewById(R.id.music_artist);
         songTitle = findViewById(R.id.music_title);
         songLength = findViewById(R.id.music_length);
         playSong = findViewById(R.id.button_play);
         stopSong = findViewById(R.id.button_stop);
-        pauseSong = findViewById(R.id.button_pause);
         nextSong = findViewById(R.id.button_next);
         previousSong = findViewById(R.id.button_previous);
         seekBar = findViewById(R.id.seek_bar);
@@ -55,7 +57,6 @@ public class MusicPlayer extends AppCompatActivity {
         playNextSong();
         playPreviousSong();
         stopPlayingSong();
-        pausePlayingSong();
     }
 
     // Listener for Playing the Song Image Button
@@ -63,11 +64,23 @@ public class MusicPlayer extends AppCompatActivity {
         playSong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                displayToastMessage("Playing Song!");
                 animateButtonClick(playSong);
+
+                if (mediaPlayer.isPlaying() && mediaPlayer != null) {
+                    mediaPlayer.pause();
+                    playSong.setImageResource(R.drawable.pause);
+                    displayToastMessage("Song Paused!");
+                } else {
+                    if (mediaPlayer != null) {
+                        mediaPlayer.start();
+                        playSong.setImageResource(R.drawable.play);
+                        displayToastMessage("Playing Song!");
+                    }
+                }
             }
         });
     }
+
     // Listener for Playing the Next Song Image Button
     private void playNextSong() {
         nextSong.setOnClickListener(new View.OnClickListener() {
@@ -95,16 +108,6 @@ public class MusicPlayer extends AppCompatActivity {
             public void onClick(View v) {
                 displayToastMessage("Song stopped!");
                 animateButtonClick(stopSong);
-            }
-        });
-    }
-    // Listener for Pausing the Song Image Button
-    private void pausePlayingSong() {
-        pauseSong.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                displayToastMessage("Song Paused!");
-                animateButtonClick(pauseSong);
             }
         });
     }
