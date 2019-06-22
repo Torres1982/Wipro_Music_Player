@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -14,11 +15,18 @@ import android.widget.Toast;
 
 import com.wipro.wipro_music_player.util.ConverterUtility;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class MusicPlayer extends AppCompatActivity {
     TextView songTitle, songArtist, songLength;
-    ImageButton playSong, stopSong, nextSong, previousSong;
+    private ImageButton playSong, stopSong, nextSong, previousSong;
     SeekBar seekBar;
-    MediaPlayer mediaPlayer;
+    private MediaPlayer mediaPlayer;
+    private String path;
+    private int songIndex;
+    private List<SongModel> listOfSongs = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,16 +38,18 @@ public class MusicPlayer extends AppCompatActivity {
         assert extras != null;
         String artist = extras.getString("artist_name");
         String title = extras.getString("song_title");
-        String path = extras.getString("song_path");
+        path = extras.getString("song_path");
         long length = extras.getLong("song_length");
         double size = extras.getDouble("song_size");
+        songIndex = extras.getInt("song_position");
 
-        String songDuration = ConverterUtility.convertMillisecondsToMinutesAndSeconds(length);
         double songSize = ConverterUtility.convertBytesToMegabytes(size);
         double songSizeRounded = ConverterUtility.roundDoubleValue(songSize, 2);
-        Toast.makeText(this, "SIZE: " + songSizeRounded + " MB", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "SIZE: " + songSizeRounded + " MB. Song Number " + songIndex, Toast.LENGTH_SHORT).show();
 
+        listOfSongs = MusicListActivity.musicList;
         mediaPlayer = new MediaPlayer();
+
         songArtist = findViewById(R.id.music_artist);
         songTitle = findViewById(R.id.music_title);
         songLength = findViewById(R.id.music_length);
@@ -49,10 +59,7 @@ public class MusicPlayer extends AppCompatActivity {
         previousSong = findViewById(R.id.button_previous);
         seekBar = findViewById(R.id.seek_bar);
 
-        songArtist.setText(artist);
-        songTitle.setText(title);
-        songLength.setText(songDuration);
-
+        updateViewDetails(artist, title, length);
         playSong();
         playNextSong();
         playPreviousSong();
@@ -68,12 +75,12 @@ public class MusicPlayer extends AppCompatActivity {
 
                 if (mediaPlayer.isPlaying() && mediaPlayer != null) {
                     mediaPlayer.pause();
-                    playSong.setImageResource(R.drawable.pause);
+                    playSong.setImageResource(R.drawable.play);
                     displayToastMessage("Song Paused!");
                 } else {
                     if (mediaPlayer != null) {
-                        mediaPlayer.start();
-                        playSong.setImageResource(R.drawable.play);
+                        startSong(path);
+                        playSong.setImageResource(R.drawable.pause);
                         displayToastMessage("Playing Song!");
                     }
                 }
@@ -84,10 +91,33 @@ public class MusicPlayer extends AppCompatActivity {
     // Listener for Playing the Next Song Image Button
     private void playNextSong() {
         nextSong.setOnClickListener(new View.OnClickListener() {
+            String artistNext, titleNext, pathNext;
+            long durationNext;
+
             @Override
             public void onClick(View v) {
-                displayToastMessage("Playing Next Song!");
                 animateButtonClick(nextSong);
+                displayToastMessage("Playing Next Song!");
+
+                if (songIndex < listOfSongs.size() - 1) {
+                    songIndex = songIndex + 1;
+                } else {
+                    songIndex = 0;
+                }
+                artistNext = listOfSongs.get(songIndex).getArtist();
+                titleNext = listOfSongs.get(songIndex).getTitle();
+                pathNext = listOfSongs.get(songIndex).getPath();
+                durationNext = listOfSongs.get(songIndex).getLength();
+
+                updateViewDetails(artistNext, titleNext, durationNext);
+
+                if (mediaPlayer.isPlaying() && mediaPlayer != null) {
+                    startSong(pathNext);
+                } else {
+                    mediaPlayer.reset();
+                }
+
+                Log.i("MUSIC_TAG", "Artist: " + artistNext + ". New Song Number is " + songIndex);
             }
         });
     }
@@ -121,5 +151,31 @@ public class MusicPlayer extends AppCompatActivity {
     private void animateButtonClick(ImageButton button) {
         Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
         button.startAnimation(animation);
+    }
+
+    // Update the song artist, title and the length of the song
+    private void updateViewDetails(String artist, String title, long duration) {
+        String songDuration = ConverterUtility.convertMillisecondsToMinutesAndSeconds(duration);
+        songArtist.setText(artist);
+        songTitle.setText(title);
+        songLength.setText(songDuration);
+    }
+
+    // Prepare and start playing the song
+    public void startSong(String path) {
+        try {
+            mediaPlayer.reset();
+            mediaPlayer.setDataSource(path);
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mediaPlayer.release();
     }
 }

@@ -29,7 +29,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int position) {
         final SongModel songsList = listOfSongs.get(position);
         viewHolder.artistTextView.setText(listOfSongs.get(position).getArtist());
         viewHolder.titleTextView.setText(listOfSongs.get(position).getTitle());
@@ -43,6 +43,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
                 extras.putString("song_path", songsList.getPath());
                 extras.putLong("song_length", songsList.getLength());
                 extras.putDouble("song_size", songsList.getSize());
+                extras.putInt("song_position", position);
                 Intent musicPlayerIntent = new Intent(v.getContext(), MusicPlayer.class);
                 musicPlayerIntent.putExtras(extras);
                 v.getContext().startActivity(musicPlayerIntent);

@@ -1,7 +1,6 @@
 package com.wipro.wipro_music_player;
 
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -17,13 +16,11 @@ import android.widget.Toast;
 
 import com.wipro.wipro_music_player.util.PermissionUtility;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MusicListActivity extends AppCompatActivity {
-    List<SongModel> musicList;
+    static List<SongModel> musicList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,19 +28,7 @@ public class MusicListActivity extends AppCompatActivity {
         setContentView(R.layout.songs_list);
 
         PermissionUtility.checkStoragePermissions(getApplicationContext(), this);
-
-        //PlayerManager playerManager = new PlayerManager();
-        //ArrayList<String> songsList = playerManager.findSongs(path);
-        //Log.i("MUSIC_TAG", " " + songsList);
-
-        //String songLength = ConverterUtility.convertMillisecondsToMinutesAndSeconds(764000);
-        //double songSize = ConverterUtility.convertBytesToMegabytes(4845638);
-        //Toast.makeText(this,"Song Length: " + songLength, Toast.LENGTH_SHORT).show();
-        //Log.i("MUSIC_TAG", "DURATION: " + songLength + " SIZE: " + songSize + " MB");
-
         musicList = getAllAudioFromDevice(this);
-        //Toast.makeText(this,"LIST: " + musicList.get(0).getArtist(), Toast.LENGTH_SHORT).show();
-
         List<SongModel> music = new ArrayList<>();
 
         for (int i = 0; i < musicList.size(); i++) {
@@ -85,7 +70,6 @@ public class MusicListActivity extends AppCompatActivity {
 
         if (cursor != null) {
             while (cursor.moveToNext()) {
-                // Create a model object.
                 SongModel songModel = new SongModel();
 
                 String artist = cursor.getString(3);
@@ -93,16 +77,15 @@ public class MusicListActivity extends AppCompatActivity {
                 String path = cursor.getString(0);
                 long duration = cursor.getLong(4);
                 double size = cursor.getLong(5);
-
                 //String album = cursor.getString(2);
                 //String name = cursor.getString(6);
 
-                // Set data to the model object
                 songModel.setArtist(artist);
                 songModel.setTitle(title);
                 songModel.setPath(path);
                 songModel.setLength(duration);
                 songModel.setSize(size);
+                listOfSongs.add(songModel);
 
                 //Log.i("MUSIC_TAG", "ARTIST: " + artist);
                 //Log.i("MUSIC_TAG", "TITLE: " + title);
@@ -110,9 +93,6 @@ public class MusicListActivity extends AppCompatActivity {
                 //Log.i("MUSIC_TAG", "PATH: " + path);
                 //Log.i("MUSIC_TAG", "ALBUM: " + album);
                 //Log.i("MUSIC_TAG", "NAME: " + name);
-
-                // Add the model object to the list
-                listOfSongs.add(songModel);
             }
             cursor.close();
         } else {
