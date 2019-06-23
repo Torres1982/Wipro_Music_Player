@@ -121,6 +121,7 @@ public class MusicPlayer extends AppCompatActivity {
             }
         });
     }
+
     // Listener for Playing the Previous Song Image Button
     private void playPreviousSong() {
         previousSong.setOnClickListener(new View.OnClickListener() {
@@ -131,13 +132,15 @@ public class MusicPlayer extends AppCompatActivity {
             }
         });
     }
+
     // Listener for Stopping the Song Image Button
     private void stopPlayingSong() {
         stopSong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                displayToastMessage("Song stopped!");
                 animateButtonClick(stopSong);
+                displayToastMessage("Song stopped!");
+                mediaPlayer.reset();
             }
         });
     }
