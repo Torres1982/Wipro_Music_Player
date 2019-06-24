@@ -3,6 +3,7 @@ package com.wipro.wipro_music_player;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
@@ -87,17 +88,13 @@ public class MusicListActivity extends AppCompatActivity {
                 songModel.setSize(size);
                 listOfSongs.add(songModel);
 
-                //Log.i("MUSIC_TAG", "ARTIST: " + artist);
-                //Log.i("MUSIC_TAG", "TITLE: " + title);
-                //Log.i("MUSIC_TAG", "DURATION: " + duration + " SIZE: " + size);
-                //Log.i("MUSIC_TAG", "PATH: " + path);
-                //Log.i("MUSIC_TAG", "ALBUM: " + album);
-                //Log.i("MUSIC_TAG", "NAME: " + name);
+                Log.i(MusicPlayer.MUSIC_TAG, "ARTIST: " + artist + ". TITLE: " + title + ". LENGTH: " + duration + ". SIZE: " + size + ". PATH: " + path);
             }
             cursor.close();
         } else {
-            Toast.makeText(this,"Music List is Empty!", Toast.LENGTH_SHORT).show();
-            Log.i("MUSIC_TAG", "Music List is Empty!");
+            String message = "Music List is Empty!";
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+            Log.i(MusicPlayer.MUSIC_TAG, message);
         }
         return listOfSongs;
     }

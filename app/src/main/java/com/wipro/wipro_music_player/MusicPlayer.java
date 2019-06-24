@@ -27,6 +27,7 @@ public class MusicPlayer extends AppCompatActivity {
     private String path;
     private int songIndex;
     private List<SongModel> listOfSongs = new ArrayList<>();
+    final static String MUSIC_TAG = "MUSIC_TAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +70,9 @@ public class MusicPlayer extends AppCompatActivity {
     // Listener for Playing the Song Image Button
     private void playSong() {
         playSong.setOnClickListener(new View.OnClickListener() {
+            String messagePlay = "Playing Song!";
+            String messagePause = "Playing Song Paused!";
+
             @Override
             public void onClick(View v) {
                 animateButtonClick(playSong);
@@ -76,12 +80,14 @@ public class MusicPlayer extends AppCompatActivity {
                 if (mediaPlayer.isPlaying() && mediaPlayer != null) {
                     mediaPlayer.pause();
                     playSong.setImageResource(R.drawable.play);
-                    displayToastMessage("Song Paused!");
+                    displayToastMessage(messagePause);
+                    Log.i(MUSIC_TAG, messagePause);
                 } else {
                     if (mediaPlayer != null) {
                         startSong(path);
                         playSong.setImageResource(R.drawable.pause);
-                        displayToastMessage("Playing Song!");
+                        displayToastMessage(messagePlay);
+                        Log.i(MUSIC_TAG, messagePlay);
                     }
                 }
             }
@@ -92,13 +98,15 @@ public class MusicPlayer extends AppCompatActivity {
     private void playNextSong() {
         nextSong.setOnClickListener(new View.OnClickListener() {
             String artistNext, titleNext, pathNext;
+            String message = "Playing Next Song!";
             long durationNext;
             double sizeNext, sizeNextRounded;
 
             @Override
             public void onClick(View v) {
                 animateButtonClick(nextSong);
-                displayToastMessage("Playing Next Song!");
+                displayToastMessage(message);
+                Log.i(MUSIC_TAG, message);
 
                 if (songIndex < listOfSongs.size() - 1) {
                     songIndex = songIndex + 1;
@@ -117,7 +125,7 @@ public class MusicPlayer extends AppCompatActivity {
                 updateViewDetails(artistNext, titleNext, durationNext);
                 resetWhenPlayingNextOrPreviousSongBeingPausedOrStopped(path);
 
-                Log.i("MUSIC_TAG", "SIZE: " + sizeNextRounded + " MB. NEW SONG INDEX: " + songIndex);
+                Log.i(MUSIC_TAG, "SIZE: " + sizeNextRounded + " MB. NEW SONG INDEX: " + songIndex);
             }
         });
     }
@@ -126,13 +134,15 @@ public class MusicPlayer extends AppCompatActivity {
     private void playPreviousSong() {
         previousSong.setOnClickListener(new View.OnClickListener() {
             String artistPrevious, titlePrevious, pathPrevious;
+            String message = "Playing Previous Song!";
             long durationPrevious;
             double sizePrevious, sizePreviousRounded;
 
             @Override
             public void onClick(View v) {
                 animateButtonClick(previousSong);
-                displayToastMessage("Playing Previous Song!");
+                displayToastMessage(message);
+                Log.i(MUSIC_TAG, message);
 
                 if (songIndex == 0) {
                     songIndex = listOfSongs.size() - 1;
@@ -151,7 +161,7 @@ public class MusicPlayer extends AppCompatActivity {
                 updateViewDetails(artistPrevious, titlePrevious, durationPrevious);
                 resetWhenPlayingNextOrPreviousSongBeingPausedOrStopped(path);
 
-                Log.i("MUSIC_TAG", "SIZE: " + sizePreviousRounded + " MB. NEW SONG INDEX: " + songIndex);
+                Log.i(MUSIC_TAG, "SIZE: " + sizePreviousRounded + " MB. NEW SONG INDEX: " + songIndex);
             }
         });
     }
@@ -159,10 +169,13 @@ public class MusicPlayer extends AppCompatActivity {
     // Listener for Stopping the Song Image Button
     private void stopPlayingSong() {
         stopSong.setOnClickListener(new View.OnClickListener() {
+            String message = "Playing Song Stopped!";
+
             @Override
             public void onClick(View v) {
                 animateButtonClick(stopSong);
-                displayToastMessage("Song stopped!");
+                displayToastMessage(message);
+                Log.i(MUSIC_TAG, message);
                 mediaPlayer.reset();
                 playSong.setImageResource(R.drawable.play);
             }
