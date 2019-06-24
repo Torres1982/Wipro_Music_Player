@@ -45,7 +45,7 @@ public class MusicPlayer extends AppCompatActivity {
 
         double songSize = ConverterUtility.convertBytesToMegabytes(size);
         double songSizeRounded = ConverterUtility.roundDoubleValue(songSize, 2);
-        Toast.makeText(this, "SIZE: " + songSizeRounded + " MB. Song Number " + songIndex, Toast.LENGTH_SHORT).show();
+        displayToastMessage("SIZE: " + songSizeRounded + " MB");
 
         listOfSongs = MusicListActivity.musicList;
         mediaPlayer = new MediaPlayer();
@@ -93,6 +93,7 @@ public class MusicPlayer extends AppCompatActivity {
         nextSong.setOnClickListener(new View.OnClickListener() {
             String artistNext, titleNext, pathNext;
             long durationNext;
+            double sizeNext, sizeNextRounded;
 
             @Override
             public void onClick(View v) {
@@ -104,20 +105,19 @@ public class MusicPlayer extends AppCompatActivity {
                 } else {
                     songIndex = 0;
                 }
+
                 artistNext = listOfSongs.get(songIndex).getArtist();
                 titleNext = listOfSongs.get(songIndex).getTitle();
                 pathNext = listOfSongs.get(songIndex).getPath();
                 durationNext = listOfSongs.get(songIndex).getLength();
+                sizeNext = ConverterUtility.convertBytesToMegabytes(listOfSongs.get(songIndex).getSize());
+                sizeNextRounded = ConverterUtility.roundDoubleValue(sizeNext, 2);
+                path = pathNext;
 
                 updateViewDetails(artistNext, titleNext, durationNext);
+                resetWhenPlayingNextOrPreviousSongBeingPausedOrStopped(path);
 
-                if (mediaPlayer.isPlaying() && mediaPlayer != null) {
-                    startSong(pathNext);
-                } else {
-                    mediaPlayer.reset();
-                }
-
-                Log.i("MUSIC_TAG", "Artist: " + artistNext + ". New Song Number is " + songIndex);
+                Log.i("MUSIC_TAG", "SIZE: " + sizeNextRounded + " MB. NEW SONG INDEX: " + songIndex);
             }
         });
     }
@@ -125,10 +125,33 @@ public class MusicPlayer extends AppCompatActivity {
     // Listener for Playing the Previous Song Image Button
     private void playPreviousSong() {
         previousSong.setOnClickListener(new View.OnClickListener() {
+            String artistPrevious, titlePrevious, pathPrevious;
+            long durationPrevious;
+            double sizePrevious, sizePreviousRounded;
+
             @Override
             public void onClick(View v) {
-                displayToastMessage("Playing Previous Song!");
                 animateButtonClick(previousSong);
+                displayToastMessage("Playing Previous Song!");
+
+                if (songIndex == 0) {
+                    songIndex = listOfSongs.size() - 1;
+                } else {
+                    songIndex = songIndex - 1;
+                }
+
+                artistPrevious = listOfSongs.get(songIndex).getArtist();
+                titlePrevious = listOfSongs.get(songIndex).getTitle();
+                pathPrevious = listOfSongs.get(songIndex).getPath();
+                durationPrevious = listOfSongs.get(songIndex).getLength();
+                sizePrevious = ConverterUtility.convertBytesToMegabytes(listOfSongs.get(songIndex).getSize());
+                sizePreviousRounded = ConverterUtility.roundDoubleValue(sizePrevious, 2);
+                path = pathPrevious;
+
+                updateViewDetails(artistPrevious, titlePrevious, durationPrevious);
+                resetWhenPlayingNextOrPreviousSongBeingPausedOrStopped(path);
+
+                Log.i("MUSIC_TAG", "SIZE: " + sizePreviousRounded + " MB. NEW SONG INDEX: " + songIndex);
             }
         });
     }
@@ -141,6 +164,7 @@ public class MusicPlayer extends AppCompatActivity {
                 animateButtonClick(stopSong);
                 displayToastMessage("Song stopped!");
                 mediaPlayer.reset();
+                playSong.setImageResource(R.drawable.play);
             }
         });
     }
@@ -165,7 +189,7 @@ public class MusicPlayer extends AppCompatActivity {
     }
 
     // Prepare and start playing the song
-    public void startSong(String path) {
+    private void startSong(String path) {
         try {
             mediaPlayer.reset();
             mediaPlayer.setDataSource(path);
@@ -173,6 +197,15 @@ public class MusicPlayer extends AppCompatActivity {
             mediaPlayer.start();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    // Reset the Song when Next or Previous player button has been clicked
+    private void resetWhenPlayingNextOrPreviousSongBeingPausedOrStopped(String path) {
+        if (mediaPlayer.isPlaying() && mediaPlayer != null) {
+            startSong(path);
+        } else {
+            mediaPlayer.reset();
         }
     }
 
