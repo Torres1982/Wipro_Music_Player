@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MusicPlayer">
 
     <TextView
@@ -57,29 +56,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_forty"
-        android:layout_marginEnd="@dimen/margin_forty"
         android:layout_marginTop="@dimen/margin_forty"
+        android:layout_marginEnd="@dimen/margin_forty"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/music_main_image" />
 
     <TextView
         android:id="@+id/music_length"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="@dimen/text_artist_eighteen"
+        android:layout_marginStart="@dimen/margin_sixty"
         app:layout_constraintEnd_toStartOf="@id/time_elapsed"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/seek_bar"/>
+        app:layout_constraintTop_toBottomOf="@id/seek_bar" />
 
     <TextView
         android:id="@+id/time_elapsed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/text_artist_eighteen"
+        android:layout_marginEnd="@dimen/margin_sixty"
+        android:textAlignment="viewEnd"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@id/music_length"
         app:layout_constraintTop_toBottomOf="@id/seek_bar" />
 
@@ -87,8 +87,8 @@
         android:id="@+id/button_previous"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_forty"
         android:layout_marginStart="@dimen/margin_twenty"
+        android:layout_marginTop="@dimen/margin_forty"
         android:background="@null"
         android:clickable="true"
         android:contentDescription="@string/icon_description"
