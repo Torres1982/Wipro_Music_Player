@@ -3,7 +3,6 @@ package com.wipro.wipro_music_player;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;

@@ -21,4 +21,19 @@ public class ConverterUtility {
         if (seconds < 10) time =  minutes + ":0" + seconds;
         return time;
     }
+
+    // Get the progress percentage for the Seek Bar
+    public static int getSeekBarProgressRatio(long totalTime, long currentTime) {
+        long total = (int) (totalTime / 1000);
+        long current = (int) (currentTime / 1000);
+        double ratio = (((double) current) / total) * 100;
+        return (int) ratio;
+    }
+
+    // Get the Time progression to where the Progress Bar is moved
+    public static int getSeekBarProgressTime(int progress, int totalTime) {
+        totalTime = totalTime / 1000;
+        int newProgressTime = (int) (((double) progress / 100) * totalTime);
+        return newProgressTime * 1000;
+    }
 }

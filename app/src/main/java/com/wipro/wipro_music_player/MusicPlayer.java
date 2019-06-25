@@ -3,6 +3,7 @@ package com.wipro.wipro_music_player;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -20,14 +21,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MusicPlayer extends AppCompatActivity {
-    TextView songTitle, songArtist, songLength;
+    final static String MUSIC_TAG = "MUSIC_TAG";
+    private TextView songTitle, songArtist, songLength;
     private ImageButton playSong, stopSong, nextSong, previousSong;
-    SeekBar seekBar;
+    private SeekBar seekBar;
     private MediaPlayer mediaPlayer;
     private String path;
     private int songIndex;
     private List<SongModel> listOfSongs = new ArrayList<>();
-    final static String MUSIC_TAG = "MUSIC_TAG";
+    private String artistNewSong;
+    private String titleNewSong;
+    private long durationNewSong;
+    private Handler musicHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,35 +64,45 @@ public class MusicPlayer extends AppCompatActivity {
         nextSong = findViewById(R.id.button_next);
         previousSong = findViewById(R.id.button_previous);
         seekBar = findViewById(R.id.seek_bar);
+        seekBar.setMax(100);
 
         updateViewDetails(artist, title, length);
-        playSong();
-        playNextSong();
-        playPreviousSong();
-        stopPlayingSong();
+        setSeekBarListener();
+        setPlaySongListener();
+        setPlayNextSongListener();
+        setPlayPreviousSongListener();
+        setStopPlayingSongListener();
+        setMediaPlayerListener();
     }
 
     // Listener for Playing the Song Image Button
-    private void playSong() {
+    private void setPlaySongListener() {
         playSong.setOnClickListener(new View.OnClickListener() {
-            String messagePlay = "Playing Song!";
-            String messagePause = "Playing Song Paused!";
+            int songCurrentPosition;
 
             @Override
             public void onClick(View v) {
                 animateButtonClick(playSong);
 
                 if (mediaPlayer.isPlaying() && mediaPlayer != null) {
+                    songCurrentPosition = mediaPlayer.getCurrentPosition();
                     mediaPlayer.pause();
                     playSong.setImageResource(R.drawable.play);
-                    displayToastMessage(messagePause);
-                    Log.i(MUSIC_TAG, messagePause);
+                    showToastMessageAndLogMessageTogether("Playing Song Paused!");
                 } else {
+                    // Paused status
                     if (mediaPlayer != null) {
-                        startSong(path);
+                        if (songCurrentPosition > 0) {
+                            mediaPlayer.seekTo(songCurrentPosition);
+                            mediaPlayer.start();
+                            showToastMessageAndLogMessageTogether("Playing Song Resumed!");
+                            songCurrentPosition = 0;
+                        // Stopped status
+                        } else {
+                            startSong(path);
+                            showToastMessageAndLogMessageTogether("Playing Song!");
+                        }
                         playSong.setImageResource(R.drawable.pause);
-                        displayToastMessage(messagePlay);
-                        Log.i(MUSIC_TAG, messagePlay);
                     }
                 }
             }
@@ -95,96 +110,83 @@ public class MusicPlayer extends AppCompatActivity {
     }
 
     // Listener for Playing the Next Song Image Button
-    private void playNextSong() {
+    private void setPlayNextSongListener() {
         nextSong.setOnClickListener(new View.OnClickListener() {
-            String artistNext, titleNext, pathNext;
-            String message = "Playing Next Song!";
-            long durationNext;
-            double sizeNext, sizeNextRounded;
-
             @Override
             public void onClick(View v) {
                 animateButtonClick(nextSong);
-                displayToastMessage(message);
-                Log.i(MUSIC_TAG, message);
-
-                if (songIndex < listOfSongs.size() - 1) {
-                    songIndex = songIndex + 1;
-                } else {
-                    songIndex = 0;
-                }
-
-                artistNext = listOfSongs.get(songIndex).getArtist();
-                titleNext = listOfSongs.get(songIndex).getTitle();
-                pathNext = listOfSongs.get(songIndex).getPath();
-                durationNext = listOfSongs.get(songIndex).getLength();
-                sizeNext = ConverterUtility.convertBytesToMegabytes(listOfSongs.get(songIndex).getSize());
-                sizeNextRounded = ConverterUtility.roundDoubleValue(sizeNext, 2);
-                path = pathNext;
-
-                updateViewDetails(artistNext, titleNext, durationNext);
-                resetWhenPlayingNextOrPreviousSongBeingPausedOrStopped(path);
-
-                Log.i(MUSIC_TAG, "SIZE: " + sizeNextRounded + " MB. NEW SONG INDEX: " + songIndex);
+                switchToNextSong();
             }
         });
     }
 
     // Listener for Playing the Previous Song Image Button
-    private void playPreviousSong() {
+    private void setPlayPreviousSongListener() {
         previousSong.setOnClickListener(new View.OnClickListener() {
-            String artistPrevious, titlePrevious, pathPrevious;
-            String message = "Playing Previous Song!";
-            long durationPrevious;
-            double sizePrevious, sizePreviousRounded;
-
             @Override
             public void onClick(View v) {
                 animateButtonClick(previousSong);
-                displayToastMessage(message);
-                Log.i(MUSIC_TAG, message);
+                showToastMessageAndLogMessageTogether("Playing Previous Song!");
 
                 if (songIndex == 0) {
                     songIndex = listOfSongs.size() - 1;
                 } else {
                     songIndex = songIndex - 1;
                 }
-
-                artistPrevious = listOfSongs.get(songIndex).getArtist();
-                titlePrevious = listOfSongs.get(songIndex).getTitle();
-                pathPrevious = listOfSongs.get(songIndex).getPath();
-                durationPrevious = listOfSongs.get(songIndex).getLength();
-                sizePrevious = ConverterUtility.convertBytesToMegabytes(listOfSongs.get(songIndex).getSize());
-                sizePreviousRounded = ConverterUtility.roundDoubleValue(sizePrevious, 2);
-                path = pathPrevious;
-
-                updateViewDetails(artistPrevious, titlePrevious, durationPrevious);
-                resetWhenPlayingNextOrPreviousSongBeingPausedOrStopped(path);
-
-                Log.i(MUSIC_TAG, "SIZE: " + sizePreviousRounded + " MB. NEW SONG INDEX: " + songIndex);
+                updateToStartNewSong();
             }
         });
     }
 
     // Listener for Stopping the Song Image Button
-    private void stopPlayingSong() {
+    private void setStopPlayingSongListener() {
         stopSong.setOnClickListener(new View.OnClickListener() {
-            String message = "Playing Song Stopped!";
-
             @Override
             public void onClick(View v) {
-                animateButtonClick(stopSong);
-                displayToastMessage(message);
-                Log.i(MUSIC_TAG, message);
-                mediaPlayer.reset();
-                playSong.setImageResource(R.drawable.play);
+                if (mediaPlayer.isPlaying() && mediaPlayer != null) {
+                    animateButtonClick(stopSong);
+                    showToastMessageAndLogMessageTogether("Playing Song Stopped!");
+                    playSong.setImageResource(R.drawable.play);
+                    mediaPlayer.reset();
+                    musicHandler.removeCallbacks(musicUpdateProgressBar);
+                    seekBar.setProgress(0);
+                }
             }
         });
+    }
+
+    // Prepare and start playing the song
+    private void startSong(String path) {
+        try {
+            mediaPlayer.reset();
+            mediaPlayer.setDataSource(path);
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+            playSong.setImageResource(R.drawable.pause);
+            seekBar.setProgress(0);
+            updateSeekBar();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Loading a new Song when the Next or Previous Button has been clicked
+    private void loadNewSongOnNextOrPreviousButtonClick() {
+        artistNewSong = listOfSongs.get(songIndex).getArtist();
+        titleNewSong = listOfSongs.get(songIndex).getTitle();
+        durationNewSong = listOfSongs.get(songIndex).getLength();
+        path = listOfSongs.get(songIndex).getPath();
     }
 
     // General Toast Message method
     private void displayToastMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    // Put Toast Message and Log Message together
+    private void showToastMessageAndLogMessageTogether(String message) {
+        displayToastMessage(message);
+        Log.i(MUSIC_TAG, message);
     }
 
     // Set Animation for Image Button clicks
@@ -201,30 +203,88 @@ public class MusicPlayer extends AppCompatActivity {
         songLength.setText(songDuration);
     }
 
-    // Prepare and start playing the song
-    private void startSong(String path) {
-        try {
-            mediaPlayer.reset();
-            mediaPlayer.setDataSource(path);
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    // Updating Seek Bar progress
+    private void updateSeekBar() {
+        musicHandler.postDelayed(musicUpdateProgressBar, 100);
     }
 
-    // Reset the Song when Next or Previous player button has been clicked
-    private void resetWhenPlayingNextOrPreviousSongBeingPausedOrStopped(String path) {
-        if (mediaPlayer.isPlaying() && mediaPlayer != null) {
-            startSong(path);
-        } else {
-            mediaPlayer.reset();
+    // Set the Runnable Thread for updating the Seek Bar progress
+    private Runnable musicUpdateProgressBar = new Runnable() {
+        @Override
+        public void run() {
+            long totalTime = mediaPlayer.getDuration();
+            long currentTime = mediaPlayer.getCurrentPosition();
+            int progress = ConverterUtility.getSeekBarProgressRatio(totalTime, currentTime);
+            seekBar.setProgress(progress);
+            musicHandler.postDelayed(this, 100);
         }
+    };
+
+    // Assign the Seek Bar listener
+    private void setSeekBarListener() {
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) { }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                musicHandler.removeCallbacks(musicUpdateProgressBar);
+                Log.i(MUSIC_TAG, "Progress Bar User Interaction!");
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                musicHandler.removeCallbacks(musicUpdateProgressBar);
+                int totalTime = mediaPlayer.getDuration();
+                int currentTime = ConverterUtility.getSeekBarProgressTime(seekBar.getProgress(), totalTime);
+                mediaPlayer.seekTo(currentTime);
+                updateSeekBar();
+            }
+        });
+    }
+
+    // Playing the Next Song either the 'Next Song' button is clicked or automatically play the song when the previous song has finished playing
+    private void switchToNextSong() {
+        showToastMessageAndLogMessageTogether("Playing Next Song!");
+
+        if (songIndex < listOfSongs.size() - 1) {
+            songIndex = songIndex + 1;
+        } else {
+            songIndex = 0;
+        }
+        updateToStartNewSong();
+    }
+
+    // Updating info on the Next Song play
+    private void updateToStartNewSong() {
+        loadNewSongOnNextOrPreviousButtonClick();
+        updateViewDetails(artistNewSong, titleNewSong, durationNewSong);
+        startSong(path);
+        Log.i(MUSIC_TAG, "Artist: " + artistNewSong + ". New Song Index: " + songIndex);
+    }
+
+    // Set the On Completion Media Player Listener
+    private void setMediaPlayerListener() {
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                switchToNextSong();
+            }
+        });
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        musicHandler.removeCallbacksAndMessages(null);
+        Log.i(MUSIC_TAG, "On Back Pressed!");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mediaPlayer.release();
+        mediaPlayer = null;
+        Log.i(MUSIC_TAG, "Music Player Activity Destroyed!");
     }
 }
