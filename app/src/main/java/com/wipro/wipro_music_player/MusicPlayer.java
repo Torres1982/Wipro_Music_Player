@@ -20,9 +20,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.wipro.wipro_music_player.R.id.music_size;
+
 public class MusicPlayer extends AppCompatActivity {
     final static String MUSIC_TAG = "MUSIC_TAG";
-    private TextView songTitle, songArtist, songLength;
+    private TextView songTitle, songArtist, songSize, songLength;
     private ImageButton playSong, stopSong, nextSong, previousSong;
     private SeekBar seekBar;
     private MediaPlayer mediaPlayer;
@@ -31,6 +33,7 @@ public class MusicPlayer extends AppCompatActivity {
     private List<SongModel> listOfSongs = new ArrayList<>();
     private String artistNewSong;
     private String titleNewSong;
+    private double sizeNewSong;
     private long durationNewSong;
     private Handler musicHandler = new Handler();
 
@@ -49,15 +52,12 @@ public class MusicPlayer extends AppCompatActivity {
         double size = extras.getDouble("song_size");
         songIndex = extras.getInt("song_position");
 
-        double songSize = ConverterUtility.convertBytesToMegabytes(size);
-        double songSizeRounded = ConverterUtility.roundDoubleValue(songSize, 2);
-        displayToastMessage("SIZE: " + songSizeRounded + " MB");
-
         listOfSongs = MusicListActivity.musicList;
         mediaPlayer = new MediaPlayer();
 
         songArtist = findViewById(R.id.music_artist);
         songTitle = findViewById(R.id.music_title);
+        songSize = findViewById(R.id.music_size);
         songLength = findViewById(R.id.music_length);
         playSong = findViewById(R.id.button_play);
         stopSong = findViewById(R.id.button_stop);
@@ -66,7 +66,7 @@ public class MusicPlayer extends AppCompatActivity {
         seekBar = findViewById(R.id.seek_bar);
         seekBar.setMax(100);
 
-        updateViewDetails(artist, title, length);
+        updateViewDetails(artist, title, size, length);
         setSeekBarListener();
         setPlaySongListener();
         setPlayNextSongListener();
@@ -174,6 +174,7 @@ public class MusicPlayer extends AppCompatActivity {
     private void loadNewSongOnNextOrPreviousButtonClick() {
         artistNewSong = listOfSongs.get(songIndex).getArtist();
         titleNewSong = listOfSongs.get(songIndex).getTitle();
+        sizeNewSong = listOfSongs.get(songIndex).getSize();
         durationNewSong = listOfSongs.get(songIndex).getLength();
         path = listOfSongs.get(songIndex).getPath();
     }
@@ -184,7 +185,7 @@ public class MusicPlayer extends AppCompatActivity {
     }
 
     // Put Toast Message and Log Message together
-    private void showToastMessageAndLogMessageTogether(String message) {
+    public void showToastMessageAndLogMessageTogether(String message) {
         displayToastMessage(message);
         Log.i(MUSIC_TAG, message);
     }
@@ -196,11 +197,21 @@ public class MusicPlayer extends AppCompatActivity {
     }
 
     // Update the song artist, title and the length of the song
-    private void updateViewDetails(String artist, String title, long duration) {
+    private void updateViewDetails(String artist, String title, double size, long duration) {
+        String stringSongSize = getDoubleToStringValueOfConvertedAndRoundedSongSize(size);
         String songDuration = ConverterUtility.convertMillisecondsToMinutesAndSeconds(duration);
+
         songArtist.setText(artist);
         songTitle.setText(title);
+        songSize.setText(stringSongSize);
         songLength.setText(songDuration);
+    }
+
+    // Get the String value of the song size (double)
+    private String getDoubleToStringValueOfConvertedAndRoundedSongSize(double size) {
+        double convertedSongSize = ConverterUtility.convertBytesToMegabytes(size);
+        double convertedSongSizeRounded = ConverterUtility.roundDoubleValue(convertedSongSize, 2);
+        return (Double.toString(convertedSongSizeRounded)) + " MB";
     }
 
     // Updating Seek Bar progress
@@ -258,7 +269,7 @@ public class MusicPlayer extends AppCompatActivity {
     // Updating info on the Next Song play
     private void updateToStartNewSong() {
         loadNewSongOnNextOrPreviousButtonClick();
-        updateViewDetails(artistNewSong, titleNewSong, durationNewSong);
+        updateViewDetails(artistNewSong, titleNewSong, sizeNewSong, durationNewSong);
         startSong(path);
         Log.i(MUSIC_TAG, "Artist: " + artistNewSong + ". New Song Index: " + songIndex);
     }
