@@ -24,7 +24,7 @@ import static com.wipro.wipro_music_player.R.id.music_size;
 
 public class MusicPlayer extends AppCompatActivity {
     final static String MUSIC_TAG = "MUSIC_TAG";
-    private TextView songTitle, songArtist, songSize, songLength;
+    private TextView songTitle, songArtist, songSize, songLength, songTimeElapsed;
     private ImageButton playSong, stopSong, nextSong, previousSong;
     private SeekBar seekBar;
     private MediaPlayer mediaPlayer;
@@ -59,12 +59,14 @@ public class MusicPlayer extends AppCompatActivity {
         songTitle = findViewById(R.id.music_title);
         songSize = findViewById(R.id.music_size);
         songLength = findViewById(R.id.music_length);
+        songTimeElapsed = findViewById(R.id.time_elapsed);
         playSong = findViewById(R.id.button_play);
         stopSong = findViewById(R.id.button_stop);
         nextSong = findViewById(R.id.button_next);
         previousSong = findViewById(R.id.button_previous);
         seekBar = findViewById(R.id.seek_bar);
         seekBar.setMax(100);
+        songTimeElapsed.setText(R.string.initial_timer);
 
         updateViewDetails(artist, title, size, length);
         setSeekBarListener();
@@ -147,6 +149,7 @@ public class MusicPlayer extends AppCompatActivity {
                     animateButtonClick(stopSong);
                     showToastMessageAndLogMessageTogether("Playing Song Stopped!");
                     playSong.setImageResource(R.drawable.play);
+                    songTimeElapsed.setText(R.string.initial_timer);
                     mediaPlayer.reset();
                     musicHandler.removeCallbacks(musicUpdateProgressBar);
                     seekBar.setProgress(0);
@@ -225,6 +228,7 @@ public class MusicPlayer extends AppCompatActivity {
         public void run() {
             long totalTime = mediaPlayer.getDuration();
             long currentTime = mediaPlayer.getCurrentPosition();
+            songTimeElapsed.setText(ConverterUtility.convertMillisecondsToMinutesAndSeconds(currentTime));
             int progress = ConverterUtility.getSeekBarProgressRatio(totalTime, currentTime);
             seekBar.setProgress(progress);
             musicHandler.postDelayed(this, 100);
