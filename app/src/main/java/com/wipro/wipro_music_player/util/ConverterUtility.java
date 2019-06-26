@@ -36,4 +36,10 @@ public class ConverterUtility {
         int newProgressTime = (int) (((double) progress / 100) * totalTime);
         return newProgressTime * 1000;
     }
+
+    // Random integer generator
+    public static int generateRandomSongIndex(int listSize) {
+
+        return 20;
+    }
 }

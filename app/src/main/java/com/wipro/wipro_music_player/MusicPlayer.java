@@ -272,18 +272,10 @@ public class MusicPlayer extends AppCompatActivity {
         showToastMessageAndLogMessageTogether("Playing Next Song!");
 
         if (isRepeatSongSwitchOn) {
-            // Keep the same songIndex
-            // Play Song
-            startSong(path);
-        }
-
-//        else if (isShuffleSongsSwitchOn) {
-//                    // Generate Random songIndex
-//                    // Play Song
-//                }
-
-        else {
-
+            songIndex = songIndex;
+        } else if (isShuffleSongsSwitchOn) {
+            songIndex = ConverterUtility.generateRandomSongIndex(listOfSongs.size());
+        } else {
             if (songIndex < listOfSongs.size() - 1) {
                 songIndex = songIndex + 1;
             } else {
