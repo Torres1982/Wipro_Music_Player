@@ -1,5 +1,6 @@
 package com.wipro.wipro_music_player;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -24,12 +25,11 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
         View musicItem = inflater.inflate(R.layout.song_row, parent, false);
-        ViewHolder viewHolder = new ViewHolder(musicItem);
-        return viewHolder;
+        return new ViewHolder(musicItem);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, final int position) {
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, @SuppressLint("RecyclerView") final int position) {
         final SongModel songsList = listOfSongs.get(position);
         viewHolder.artistTextView.setText(listOfSongs.get(position).getArtist());
         viewHolder.titleTextView.setText(listOfSongs.get(position).getTitle());

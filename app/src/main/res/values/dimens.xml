@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="text_title_twenty_four">24sp</dimen>
+    <dimen name="text_title_twenty_two">22sp</dimen>
     <dimen name="text_title_twenty">20sp</dimen>
-    <dimen name="text_artist_eighteen">18sp</dimen>
+    <dimen name="text_eighteen">18sp</dimen>
+    <dimen name="text_artist_sixteen">16sp</dimen>
     <dimen name="text_artist_fourteen">14sp</dimen>
     <dimen name="height_three_hundred">300dp</dimen>
     <dimen name="margin_sixty">60dp</dimen>
     <dimen name="margin_forty">40dp</dimen>
+    <dimen name="size_twenty_five">25dp</dimen>
     <dimen name="margin_twenty">20dp</dimen>
-    <dimen name="song_row_margin_top">8dp</dimen>
-    <dimen name="song_row_margin_bottom">5dp</dimen>
+    <dimen name="margin_ten">10dp</dimen>
+    <dimen name="margin_eight">8dp</dimen>
+    <dimen name="margin_five">5dp</dimen>
+    <dimen name="margin_two">2dp</dimen>
     <dimen name="divider_size">1px</dimen>
 </resources>

@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".MusicPlayer">
 
     <TextView
         android:id="@+id/music_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_forty"
+        android:layout_marginStart="@dimen/margin_twenty"
+        android:layout_marginEnd="@dimen/margin_twenty"
+        android:layout_marginTop="@dimen/margin_twenty"
         android:layout_marginBottom="@dimen/margin_twenty"
         android:gravity="center"
-        android:textSize="@dimen/text_title_twenty_four"
+        android:textSize="@dimen/text_title_twenty_two"
+        android:lines="2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -21,11 +25,24 @@
         android:id="@+id/music_artist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_twenty"
+        android:layout_marginEnd="@dimen/margin_twenty"
         android:gravity="center"
-        android:textSize="@dimen/text_artist_eighteen"
+        android:textSize="@dimen/text_artist_sixteen"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/music_title" />
+
+    <TextView
+        android:id="@+id/music_size"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_five"
+        android:gravity="center"
+        android:textSize="@dimen/text_artist_fourteen"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/music_artist" />
 
     <ImageView
         android:id="@+id/music_main_image"
@@ -38,35 +55,46 @@
         android:contentDescription="@string/icon_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/music_artist" />
+        app:layout_constraintTop_toBottomOf="@id/music_size" />
 
     <SeekBar
         android:id="@+id/seek_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_forty"
-        android:layout_marginEnd="@dimen/margin_forty"
         android:layout_marginTop="@dimen/margin_forty"
+        android:layout_marginEnd="@dimen/margin_forty"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/music_main_image" />
 
     <TextView
         android:id="@+id/music_length"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/text_artist_eighteen"
-        android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="@dimen/text_eighteen"
+        android:layout_marginStart="@dimen/margin_sixty"
+        app:layout_constraintEnd_toStartOf="@id/time_elapsed"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/seek_bar"/>
+        app:layout_constraintTop_toBottomOf="@id/seek_bar" />
+
+    <TextView
+        android:id="@+id/time_elapsed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/text_eighteen"
+        android:layout_marginEnd="@dimen/margin_sixty"
+        android:textAlignment="viewEnd"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/music_length"
+        app:layout_constraintTop_toBottomOf="@id/seek_bar" />
 
     <ImageButton
         android:id="@+id/button_previous"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_forty"
         android:layout_marginStart="@dimen/margin_twenty"
+        android:layout_marginTop="@dimen/margin_forty"
         android:background="@null"
         android:clickable="true"
         android:contentDescription="@string/icon_description"
@@ -118,4 +146,34 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/button_stop"
         app:layout_constraintTop_toBottomOf="@id/seek_bar" />
+
+    <Switch
+        android:id="@+id/switch_shuffle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_twenty"
+        android:switchPadding="@dimen/margin_ten"
+        android:text="@string/shuffle"
+        android:textSize="@dimen/text_title_twenty_two"
+        android:textColor="@color/grey"
+        android:track="@drawable/switch_track"
+        android:thumb="@drawable/switch_thumb"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/switch_repeat"
+        app:layout_constraintTop_toBottomOf="@id/button_previous" />
+
+    <Switch
+        android:id="@+id/switch_repeat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_twenty"
+        android:switchPadding="@dimen/margin_ten"
+        android:text="@string/repeat_song"
+        android:textSize="@dimen/text_title_twenty_two"
+        android:textColor="@color/grey"
+        android:track="@drawable/switch_track"
+        android:thumb="@drawable/switch_thumb"
+        app:layout_constraintStart_toEndOf="@id/switch_shuffle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_previous" />
 </android.support.constraint.ConstraintLayout>
