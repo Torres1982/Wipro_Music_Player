@@ -1,6 +1,7 @@
 package com.wipro.wipro_music_player;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,8 +10,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,13 +23,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.wipro.wipro_music_player.R.id.music_size;
-
 public class MusicPlayer extends AppCompatActivity {
     final static String MUSIC_TAG = "MUSIC_TAG";
     private TextView songTitle, songArtist, songSize, songLength, songTimeElapsed;
     private ImageButton playSong, stopSong, nextSong, previousSong;
     private SeekBar seekBar;
+    private Switch shuffleSongsSwitch, repeatSongSwitch;
+    private boolean isShuffleSongsSwitchOn, isRepeatSongSwitchOn;
     private MediaPlayer mediaPlayer;
     private String path;
     private int songIndex;
@@ -64,6 +67,10 @@ public class MusicPlayer extends AppCompatActivity {
         stopSong = findViewById(R.id.button_stop);
         nextSong = findViewById(R.id.button_next);
         previousSong = findViewById(R.id.button_previous);
+        shuffleSongsSwitch = findViewById(R.id.switch_shuffle);
+        repeatSongSwitch = findViewById(R.id.switch_repeat);
+//        repeatSongSwitch.setTextOn("ON");
+//        repeatSongSwitch.setTextOff("OFF");
         seekBar = findViewById(R.id.seek_bar);
         seekBar.setMax(100);
         songTimeElapsed.setText(R.string.initial_timer);
@@ -75,6 +82,8 @@ public class MusicPlayer extends AppCompatActivity {
         setPlayPreviousSongListener();
         setStopPlayingSongListener();
         setMediaPlayerListener();
+        setShuffleSongsListener();
+        setRepeatSongListener();
     }
 
     // Listener for Playing the Song Image Button
@@ -99,7 +108,7 @@ public class MusicPlayer extends AppCompatActivity {
                             mediaPlayer.start();
                             showToastMessageAndLogMessageTogether("Playing Song Resumed!");
                             songCurrentPosition = 0;
-                        // Stopped status
+                            // Stopped status
                         } else {
                             startSong(path);
                             showToastMessageAndLogMessageTogether("Playing Song!");
@@ -262,10 +271,24 @@ public class MusicPlayer extends AppCompatActivity {
     private void switchToNextSong() {
         showToastMessageAndLogMessageTogether("Playing Next Song!");
 
-        if (songIndex < listOfSongs.size() - 1) {
-            songIndex = songIndex + 1;
-        } else {
-            songIndex = 0;
+        if (isRepeatSongSwitchOn) {
+            // Keep the same songIndex
+            // Play Song
+            startSong(path);
+        }
+
+//        else if (isShuffleSongsSwitchOn) {
+//                    // Generate Random songIndex
+//                    // Play Song
+//                }
+
+        else {
+
+            if (songIndex < listOfSongs.size() - 1) {
+                songIndex = songIndex + 1;
+            } else {
+                songIndex = 0;
+            }
         }
         updateToStartNewSong();
     }
@@ -286,6 +309,41 @@ public class MusicPlayer extends AppCompatActivity {
                 switchToNextSong();
             }
         });
+    }
+
+    // Listener for the Switch used for shuffling all Songs
+    private void setShuffleSongsListener() {
+        shuffleSongsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                isShuffleSongsSwitchOn = isChecked;
+                handleShuffleAndRepeatSongsListeners(isChecked,"Shuffle ON", "Shuffle OFF", shuffleSongsSwitch, repeatSongSwitch);
+            }
+        });
+    }
+
+    // Listener for the Switch used for repeating a single Song
+    private void setRepeatSongListener() {
+        repeatSongSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                isRepeatSongSwitchOn = isChecked;
+                handleShuffleAndRepeatSongsListeners(isChecked, "Repeat ON", "Repeat OFF", repeatSongSwitch, shuffleSongsSwitch);
+            }
+        });
+    }
+
+    // Handles common functionality for Shuffle and Repeat Song Listeners
+    private void handleShuffleAndRepeatSongsListeners(boolean isChecked, String messageOn, String messageOff, Switch switchOne, Switch switchTwo) {
+        if (isChecked) {
+            showToastMessageAndLogMessageTogether(messageOn);
+            switchOne.setTextColor(Color.rgb(255, 0, 0));
+            switchTwo.setChecked(false);
+        } else {
+            showToastMessageAndLogMessageTogether(messageOff);
+            switchOne.setTextColor(Color.rgb(168, 168, 168));
+        }
+        Log.i(MUSIC_TAG, "Shuffle Switch: " + isShuffleSongsSwitchOn + ". Repeat Switch: " + isRepeatSongSwitchOn);
     }
 
     @Override
