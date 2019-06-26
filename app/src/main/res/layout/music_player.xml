@@ -12,10 +12,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_twenty"
         android:layout_marginEnd="@dimen/margin_twenty"
-        android:layout_marginTop="@dimen/margin_forty"
+        android:layout_marginTop="@dimen/margin_twenty"
         android:layout_marginBottom="@dimen/margin_twenty"
         android:gravity="center"
-        android:textSize="@dimen/text_title_twenty"
+        android:textSize="@dimen/text_title_twenty_two"
         android:lines="2"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,6 +37,7 @@
         android:id="@+id/music_size"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_five"
         android:gravity="center"
         android:textSize="@dimen/text_artist_fourteen"
         app:layout_constraintEnd_toEndOf="parent"
@@ -145,4 +146,34 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/button_stop"
         app:layout_constraintTop_toBottomOf="@id/seek_bar" />
+
+    <Switch
+        android:id="@+id/switch_shuffle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_twenty"
+        android:switchPadding="@dimen/margin_ten"
+        android:text="@string/shuffle"
+        android:textSize="@dimen/text_title_twenty_two"
+        android:textColor="@color/grey"
+        android:track="@drawable/switch_track"
+        android:thumb="@drawable/switch_thumb"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/switch_repeat"
+        app:layout_constraintTop_toBottomOf="@id/button_previous" />
+
+    <Switch
+        android:id="@+id/switch_repeat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_twenty"
+        android:switchPadding="@dimen/margin_ten"
+        android:text="@string/repeat_song"
+        android:textSize="@dimen/text_title_twenty_two"
+        android:textColor="@color/grey"
+        android:track="@drawable/switch_track"
+        android:thumb="@drawable/switch_thumb"
+        app:layout_constraintStart_toEndOf="@id/switch_shuffle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_previous" />
 </android.support.constraint.ConstraintLayout>
