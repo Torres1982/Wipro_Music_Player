@@ -69,8 +69,6 @@ public class MusicPlayer extends AppCompatActivity {
         previousSong = findViewById(R.id.button_previous);
         shuffleSongsSwitch = findViewById(R.id.switch_shuffle);
         repeatSongSwitch = findViewById(R.id.switch_repeat);
-//        repeatSongSwitch.setTextOn("ON");
-//        repeatSongSwitch.setTextOff("OFF");
         seekBar = findViewById(R.id.seek_bar);
         seekBar.setMax(100);
         songTimeElapsed.setText(R.string.initial_timer);
