@@ -1,5 +1,7 @@
 package com.wipro.wipro_music_player.util;
 
+import java.util.Random;
+
 public class ConverterUtility {
     // Converting Bytes to MegaBytes
     public static double convertBytesToMegabytes(double size) {
@@ -37,9 +39,11 @@ public class ConverterUtility {
         return newProgressTime * 1000;
     }
 
-    // Random integer generator
+    // Random Song index (integer) generator
     public static int generateRandomSongIndex(int listSize) {
-
-        return 20;
+        Random random = new Random();
+        int min = 0;
+        int max = listSize - 1;
+        return random.nextInt(max - min) + min;
     }
 }
