@@ -82,6 +82,7 @@ public class MusicPlayer extends AppCompatActivity {
         setMediaPlayerListener();
         setShuffleSongsListener();
         setRepeatSongListener();
+        updateSeekBar();
     }
 
     // Listener for Playing the Song Image Button
