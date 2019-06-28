@@ -1,5 +1,10 @@
 package com.wipro.wipro_music_player;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
@@ -25,6 +30,8 @@ import java.util.List;
 
 public class MusicPlayer extends AppCompatActivity {
     final static String MUSIC_TAG = "MUSIC_TAG";
+    private static final String ACTION_BAR_CHANNEL_ID = "com.wipro.music.player";
+    static final int ACTION_BAR_NOTIFICATION_ID = 100;
     private TextView songTitle, songArtist, songSize, songLength, songTimeElapsed;
     private ImageButton playSong, stopSong, nextSong, previousSong;
     private SeekBar seekBar;
@@ -39,6 +46,7 @@ public class MusicPlayer extends AppCompatActivity {
     private double sizeNewSong;
     private long durationNewSong;
     private Handler musicHandler = new Handler();
+    public static NotificationManager notificationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +91,7 @@ public class MusicPlayer extends AppCompatActivity {
         setShuffleSongsListener();
         setRepeatSongListener();
         updateSeekBar();
+        showActionBarNotification();
     }
 
     // Listener for Playing the Song Image Button
@@ -335,6 +344,30 @@ public class MusicPlayer extends AppCompatActivity {
             switchOne.setTextColor(Color.rgb(168, 168, 168));
         }
         Log.i(MUSIC_TAG, "Shuffle Switch: " + isShuffleSongsSwitchOn + ". Repeat Switch: " + isRepeatSongSwitchOn);
+    }
+
+    // Create an Action Bar Notification
+    public void showActionBarNotification() {
+        String songArtist = listOfSongs.get(songIndex).getArtist();
+        String songTitle = listOfSongs.get(songIndex).getTitle();
+
+        Intent notIntent = new Intent(this, MusicPlayer.class);
+        notIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pendInt = PendingIntent.getActivity(this, 0, notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationChannel channel = new NotificationChannel(ACTION_BAR_CHANNEL_ID, "Channel 100", NotificationManager.IMPORTANCE_HIGH);
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.createNotificationChannel(channel);
+        Notification.Builder builder = new Notification.Builder(this, ACTION_BAR_CHANNEL_ID);
+
+        builder.setContentIntent(pendInt)
+                .setSmallIcon(R.drawable.icon_notification)
+                .setTicker(songTitle)
+                .setOngoing(true)
+                .setContentTitle(songTitle)
+                .setContentText(songArtist);
+        Notification notification = builder.build();
+        notificationManager.notify(ACTION_BAR_NOTIFICATION_ID, notification);
     }
 
     @Override

@@ -97,4 +97,10 @@ public class MusicListActivity extends AppCompatActivity {
         }
         return listOfSongs;
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        MusicPlayer.notificationManager.cancel(MusicPlayer.ACTION_BAR_NOTIFICATION_ID);
+    }
 }
