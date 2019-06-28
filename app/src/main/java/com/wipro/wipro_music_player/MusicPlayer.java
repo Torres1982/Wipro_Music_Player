@@ -351,22 +351,24 @@ public class MusicPlayer extends AppCompatActivity {
         String songArtist = listOfSongs.get(songIndex).getArtist();
         String songTitle = listOfSongs.get(songIndex).getTitle();
 
-        Intent notIntent = new Intent(this, MusicPlayer.class);
-        notIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendInt = PendingIntent.getActivity(this, 0, notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent notificationIntent = new Intent(this, MusicPlayer.class);
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationChannel channel = new NotificationChannel(ACTION_BAR_CHANNEL_ID, "Channel 100", NotificationManager.IMPORTANCE_HIGH);
+        NotificationChannel notificationChannel = new NotificationChannel(ACTION_BAR_CHANNEL_ID, "Channel 100", NotificationManager.IMPORTANCE_HIGH);
+        notificationChannel.setSound(null, null);
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.createNotificationChannel(channel);
-        Notification.Builder builder = new Notification.Builder(this, ACTION_BAR_CHANNEL_ID);
+        notificationManager.createNotificationChannel(notificationChannel);
+        Notification.Builder notificationBuilder = new Notification.Builder(this, ACTION_BAR_CHANNEL_ID);
 
-        builder.setContentIntent(pendInt)
+        notificationBuilder
+                .setContentTitle(songTitle)
+                .setContentText(songArtist)
+                .setContentIntent(pendingIntent)
                 .setSmallIcon(R.drawable.icon_notification)
                 .setTicker(songTitle)
-                .setOngoing(true)
-                .setContentTitle(songTitle)
-                .setContentText(songArtist);
-        Notification notification = builder.build();
+                .setOngoing(true);
+        Notification notification = notificationBuilder.build();
         notificationManager.notify(ACTION_BAR_NOTIFICATION_ID, notification);
     }
 
