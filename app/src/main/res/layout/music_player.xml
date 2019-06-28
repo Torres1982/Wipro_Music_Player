@@ -69,7 +69,10 @@
         android:layout_marginEnd="@dimen/margin_forty"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/music_main_image" />
+        app:layout_constraintTop_toBottomOf="@id/music_main_image"
+        android:splitTrack="false"
+        android:progressDrawable="@drawable/switch_track"
+        android:thumb="@drawable/switch_thumb" />
 
     <TextView
         android:id="@+id/music_length"
