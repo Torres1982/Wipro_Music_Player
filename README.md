@@ -1,4 +1,4 @@
-# Wipro Recycler View
+# Wipro Music Player
 
 ### Technologies used:
 
