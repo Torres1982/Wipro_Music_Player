@@ -11,9 +11,10 @@
     <dimen name="margin_forty">40dp</dimen>
     <dimen name="size_twenty_five">25dp</dimen>
     <dimen name="margin_twenty">20dp</dimen>
+    <dimen name="margin_fifteen">15dp</dimen>
     <dimen name="margin_ten">10dp</dimen>
     <dimen name="margin_eight">8dp</dimen>
     <dimen name="margin_five">5dp</dimen>
     <dimen name="margin_two">2dp</dimen>
-    <dimen name="divider_size">1px</dimen>
+    <dimen name="size_one">1px</dimen>
 </resources>

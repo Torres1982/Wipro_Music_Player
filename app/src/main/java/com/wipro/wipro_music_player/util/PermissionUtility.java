@@ -11,16 +11,15 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class PermissionUtility {
+    private final static String PERMISSION_TAG = "PERMISSION_TAG";
+    private final static String PERMISSION_MSG = "Storage Permission Accepted!";
+
     // Self-check permissions
     @SuppressLint("ObsoleteSdkInt")
     public static void checkStoragePermissions(Context context, Activity activity) {
-        final String PERMISSION_TAG = "PERMISSION_TAG";
-        final String PERMISSION_MSG = "Storage Permission Accepted!";
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (context.checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(context, PERMISSION_MSG, Toast.LENGTH_SHORT).show();
-                Log.i(PERMISSION_TAG, PERMISSION_MSG);
+                showToastAndLogMessages(context);
             } else {
                 ActivityCompat.requestPermissions(activity, new String[] {
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -29,8 +28,13 @@ public class PermissionUtility {
             }
         }
         else {
-            Toast.makeText(context, PERMISSION_MSG, Toast.LENGTH_SHORT).show();
-            Log.i(PERMISSION_TAG, PERMISSION_MSG);
+            showToastAndLogMessages(context);
         }
+    }
+
+    // Put Toast and Log messages together and reuse it across the block statements in check permission method
+    private static void showToastAndLogMessages(Context context) {
+        Toast.makeText(context, PERMISSION_MSG, Toast.LENGTH_SHORT).show();
+        Log.i(PERMISSION_TAG, PERMISSION_MSG);
     }
 }

@@ -5,12 +5,12 @@
     android:visible="true"
     android:dither="true"
     android:useLevel="false">
+    <stroke
+        android:color="@color/black"
+        android:width="@dimen/size_one" />
     <gradient
         android:startColor="@color/light_grey"
         android:endColor="@color/red"
         android:angle="180" />
     <corners android:radius="@dimen/margin_ten" />
-    <size
-        android:width="@dimen/size_twenty_five"
-        android:height="@dimen/size_twenty_five" />
 </shape>

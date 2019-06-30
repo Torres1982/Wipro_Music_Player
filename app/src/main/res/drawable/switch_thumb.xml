@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android" >
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:state_checked="true">
         <shape
@@ -27,8 +27,8 @@
             <gradient
                 android:startColor="@color/light_grey"
                 android:endColor="@color/light_grey"
-                android:angle="180"/>
-            <corners android:radius="@dimen/margin_ten"/>
+                android:angle="180" />
+            <corners android:radius="@dimen/margin_ten" />
             <size
                 android:width="@dimen/size_twenty_five"
                 android:height="@dimen/size_twenty_five" />
