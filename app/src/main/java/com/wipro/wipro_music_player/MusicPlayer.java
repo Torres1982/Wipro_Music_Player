@@ -7,12 +7,14 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.Icon;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -371,18 +373,20 @@ public class MusicPlayer extends AppCompatActivity {
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationChannel notificationChannel = new NotificationChannel(ACTION_BAR_CHANNEL_ID, "Channel 100", NotificationManager.IMPORTANCE_HIGH);
+        NotificationChannel notificationChannel = new NotificationChannel(ACTION_BAR_CHANNEL_ID, "Channel 100", NotificationManager.IMPORTANCE_DEFAULT);
         notificationChannel.setSound(null, null);
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         assert notificationManager != null;
         notificationManager.createNotificationChannel(notificationChannel);
-        Notification.Builder notificationBuilder = new Notification.Builder(this, ACTION_BAR_CHANNEL_ID);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, ACTION_BAR_CHANNEL_ID);
 
         notificationBuilder
+                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setContentTitle(songTitle)
                 .setContentText(songArtist)
                 .setContentIntent(pendingIntent)
                 .setSmallIcon(R.drawable.icon_notification)
+                //.setLargeIcon()
                 .setTicker(songTitle)
                 .setOnlyAlertOnce(true)
                 .setOngoing(true);
@@ -415,6 +419,7 @@ public class MusicPlayer extends AppCompatActivity {
                             Log.i(MusicPlayer.MUSIC_TAG, "Focus Change: Audio Focus Loss Transient.");
                         } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
                             mediaPlayer.setVolume(0.2f, 0.2f);
+                            // !!!!!!!!!!!! NEEDS to FIX because song starts playing from the beginning !!!!!!!!!!!!!!!!!!!!
                             Log.i(MusicPlayer.MUSIC_TAG, "Focus Change: Audio Focus Loss Transient Can Duck.");
                         } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
                             mediaPlayer.setVolume(0.7f, 0.7f);
