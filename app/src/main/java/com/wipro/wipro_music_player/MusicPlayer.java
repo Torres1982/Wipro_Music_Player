@@ -15,6 +15,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -22,6 +23,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -32,6 +34,8 @@ import com.wipro.wipro_music_player.util.ConverterUtility;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static android.graphics.BitmapFactory.decodeResource;
 
 public class MusicPlayer extends AppCompatActivity {
     final static String MUSIC_TAG = "MUSIC_TAG";
@@ -52,7 +56,7 @@ public class MusicPlayer extends AppCompatActivity {
     private double sizeNewSong;
     private long durationNewSong;
     private Handler musicHandler = new Handler();
-    public static NotificationManager notificationManager;
+    public static NotificationManagerCompat notificationManager;
     private static AudioManager audioManager;
     private static AudioFocusRequest audioFocusRequest;
 
@@ -101,6 +105,7 @@ public class MusicPlayer extends AppCompatActivity {
         showActionBarNotification();
         startPlaying(path);
         controlAudioFocus();
+        startService();
     }
 
     // Listener for Playing the Song Image Button
@@ -373,25 +378,39 @@ public class MusicPlayer extends AppCompatActivity {
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationChannel notificationChannel = new NotificationChannel(ACTION_BAR_CHANNEL_ID, "Channel 100", NotificationManager.IMPORTANCE_DEFAULT);
-        notificationChannel.setSound(null, null);
-        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        assert notificationManager != null;
-        notificationManager.createNotificationChannel(notificationChannel);
+        //NotificationChannel notificationChannel = new NotificationChannel(ACTION_BAR_CHANNEL_ID, "Channel 100", NotificationManager.IMPORTANCE_DEFAULT);
+        //notificationChannel.setSound(null, null);
+        notificationManager = NotificationManagerCompat.from(this);
+        //assert notificationManager != null;
+        //notificationManager.createNotificationChannel(notificationChannel);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, ACTION_BAR_CHANNEL_ID);
 
+        //RemoteViews notificationCompact = new RemoteViews(getPackageName(), R.layout.notification_compact);
+        //RemoteViews notificationExpanded = new RemoteViews(getPackageName(), R.layout.music_player);
+
         notificationBuilder
-                .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setContentTitle(songTitle)
-                .setContentText(songArtist)
-                .setContentIntent(pendingIntent)
-                .setSmallIcon(R.drawable.icon_notification)
-                //.setLargeIcon()
-                .setTicker(songTitle)
-                .setOnlyAlertOnce(true)
-                .setOngoing(true);
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setContentTitle(songTitle)
+            .setContentText(songArtist)
+            .setContentIntent(pendingIntent)
+            //.setCustomContentView(notificationCompact)
+            //.setCustomBigContentView(notificationExpanded)
+            .setSmallIcon(R.drawable.icon_notification)
+            .setLargeIcon(decodeResource(getResources(), R.drawable.icon_notification))
+                .setStyle(new NotificationCompat.BigPictureStyle()
+                        .bigPicture(decodeResource(getResources(), R.drawable.icon_notification))
+                        .bigLargeIcon(null))
+            .setTicker(songTitle)
+            .setOnlyAlertOnce(true)
+            .setOngoing(true);
         Notification notification = notificationBuilder.build();
         notificationManager.notify(ACTION_BAR_NOTIFICATION_ID, notification);
+    }
+
+    public void startService() {
+        Intent serviceIntent = new Intent(MusicPlayer.this, NotificationService.class);
+        serviceIntent.setAction(Constants.ACTION.START_FOREGROUND_ACTION);
+        startService(serviceIntent);
     }
 
     // Handles Audio Focus states
