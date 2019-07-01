@@ -7,6 +7,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,6 +43,7 @@ public class MusicPlayer extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private String path;
     private int songIndex;
+    private int songCurrentPosition;
     private List<SongModel> listOfSongs = new ArrayList<>();
     private String artistNewSong;
     private String titleNewSong;
@@ -47,6 +51,10 @@ public class MusicPlayer extends AppCompatActivity {
     private long durationNewSong;
     private Handler musicHandler = new Handler();
     public static NotificationManager notificationManager;
+
+    private static AudioManager audioManager;
+    private static AudioFocusRequest audioFocusRequest;
+    private static int focusRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,23 +99,21 @@ public class MusicPlayer extends AppCompatActivity {
         setShuffleSongsListener();
         setRepeatSongListener();
         showActionBarNotification();
-        startSong(path);
+        startPlaying(path);
+        controlAudioFocus();
     }
 
     // Listener for Playing the Song Image Button
     private void setPlaySongListener() {
         playSong.setOnClickListener(new View.OnClickListener() {
-            int songCurrentPosition;
+            //int songCurrentPosition;
 
             @Override
             public void onClick(View v) {
                 animateButtonClick(playSong);
 
                 if (mediaPlayer.isPlaying() && mediaPlayer != null) {
-                    songCurrentPosition = mediaPlayer.getCurrentPosition();
-                    mediaPlayer.pause();
-                    playSong.setImageResource(R.drawable.play);
-                    showToastMessageAndLogMessageTogether("Playing Song Paused!");
+                    pausePlaying();
                 } else {
                     // Paused status
                     if (mediaPlayer != null) {
@@ -118,7 +124,7 @@ public class MusicPlayer extends AppCompatActivity {
                             songCurrentPosition = 0;
                             // Stopped status
                         } else {
-                            startSong(path);
+                            startPlaying(path);
                             showToastMessageAndLogMessageTogether("Playing Song!");
                         }
                         playSong.setImageResource(R.drawable.pause);
@@ -163,20 +169,25 @@ public class MusicPlayer extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (mediaPlayer.isPlaying() && mediaPlayer != null) {
-                    animateButtonClick(stopSong);
-                    showToastMessageAndLogMessageTogether("Playing Song Stopped!");
-                    playSong.setImageResource(R.drawable.play);
-                    songTimeElapsed.setText(R.string.initial_timer);
-                    mediaPlayer.reset();
-                    musicHandler.removeCallbacks(musicUpdateProgressBar);
-                    seekBar.setProgress(0);
+                    stopPlaying();
                 }
             }
         });
     }
 
+    // Stop plying a Song
+    public void stopPlaying() {
+        animateButtonClick(stopSong);
+        showToastMessageAndLogMessageTogether("Playing Song Stopped!");
+        playSong.setImageResource(R.drawable.play);
+        songTimeElapsed.setText(R.string.initial_timer);
+        mediaPlayer.reset();
+        musicHandler.removeCallbacks(musicUpdateProgressBar);
+        seekBar.setProgress(0);
+    }
+
     // Prepare and start playing the song
-    private void startSong(String path) {
+    private void startPlaying(String path) {
         try {
             mediaPlayer.reset();
             mediaPlayer.setDataSource(path);
@@ -188,6 +199,14 @@ public class MusicPlayer extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    // Pause the Playing Song
+    private void pausePlaying() {
+        songCurrentPosition = mediaPlayer.getCurrentPosition();
+        mediaPlayer.pause();
+        playSong.setImageResource(R.drawable.play);
+        showToastMessageAndLogMessageTogether("Playing Song Paused!");
     }
 
     // Loading a new Song when the Next or Previous Button has been clicked
@@ -297,7 +316,7 @@ public class MusicPlayer extends AppCompatActivity {
     private void updateToStartNewSong() {
         loadNewSongOnNextOrPreviousButtonClick();
         updateViewDetails(artistNewSong, titleNewSong, sizeNewSong, durationNewSong);
-        startSong(path);
+        startPlaying(path);
         Log.i(MUSIC_TAG, "Artist: " + artistNewSong + ". New Song Index: " + songIndex);
     }
 
@@ -371,6 +390,45 @@ public class MusicPlayer extends AppCompatActivity {
                 .setOngoing(true);
         Notification notification = notificationBuilder.build();
         notificationManager.notify(ACTION_BAR_NOTIFICATION_ID, notification);
+    }
+
+    // Handles Audio Focus states
+    private void controlAudioFocus() {
+        audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_MEDIA)
+                .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                .build();
+
+        audioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                .setAudioAttributes(audioAttributes)
+                .setAcceptsDelayedFocusGain(true)
+                .setWillPauseWhenDucked(true)
+                .setOnAudioFocusChangeListener(new AudioManager.OnAudioFocusChangeListener() {
+                    @Override
+                    public void onAudioFocusChange(int focusChange) {
+                        if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                            audioManager.abandonAudioFocusRequest(audioFocusRequest);
+                            stopPlaying();
+                            Log.i(MusicPlayer.MUSIC_TAG, "Focus Change: Audio Focus Loss.");
+                        } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                            pausePlaying();
+                            Log.i(MusicPlayer.MUSIC_TAG, "Focus Change: Audio Focus Loss Transient.");
+                        } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+                            mediaPlayer.setVolume(0.2f, 0.2f);
+                            Log.i(MusicPlayer.MUSIC_TAG, "Focus Change: Audio Focus Loss Transient Can Duck.");
+                        } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                            mediaPlayer.setVolume(0.7f, 0.7f);
+                            startPlaying(path);
+                            Log.i(MusicPlayer.MUSIC_TAG, "Focus Change: Audio Focus Gain.");
+                        }
+                    }
+                })
+                .build();
+
+        mediaPlayer.setAudioAttributes(audioAttributes);
+        audioManager.requestAudioFocus(audioFocusRequest);
     }
 
     @Override
