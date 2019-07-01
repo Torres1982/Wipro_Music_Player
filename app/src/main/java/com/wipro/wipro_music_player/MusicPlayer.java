@@ -51,10 +51,8 @@ public class MusicPlayer extends AppCompatActivity {
     private long durationNewSong;
     private Handler musicHandler = new Handler();
     public static NotificationManager notificationManager;
-
     private static AudioManager audioManager;
     private static AudioFocusRequest audioFocusRequest;
-    private static int focusRequest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,8 +104,6 @@ public class MusicPlayer extends AppCompatActivity {
     // Listener for Playing the Song Image Button
     private void setPlaySongListener() {
         playSong.setOnClickListener(new View.OnClickListener() {
-            //int songCurrentPosition;
-
             @Override
             public void onClick(View v) {
                 animateButtonClick(playSong);
@@ -317,6 +313,7 @@ public class MusicPlayer extends AppCompatActivity {
         loadNewSongOnNextOrPreviousButtonClick();
         updateViewDetails(artistNewSong, titleNewSong, sizeNewSong, durationNewSong);
         startPlaying(path);
+        showActionBarNotification();
         Log.i(MUSIC_TAG, "Artist: " + artistNewSong + ". New Song Index: " + songIndex);
     }
 
@@ -387,6 +384,7 @@ public class MusicPlayer extends AppCompatActivity {
                 .setContentIntent(pendingIntent)
                 .setSmallIcon(R.drawable.icon_notification)
                 .setTicker(songTitle)
+                .setOnlyAlertOnce(true)
                 .setOngoing(true);
         Notification notification = notificationBuilder.build();
         notificationManager.notify(ACTION_BAR_NOTIFICATION_ID, notification);
