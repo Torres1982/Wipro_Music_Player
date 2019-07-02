@@ -46,4 +46,11 @@ public class ConverterUtility {
         int max = listSize - 1;
         return random.nextInt(max - min) + min;
     }
+
+    // Get the String value of the song size (double)
+    public static String getDoubleToStringValueOfConvertedAndRoundedSongSize(double size) {
+        double convertedSongSize = ConverterUtility.convertBytesToMegabytes(size);
+        double convertedSongSizeRounded = ConverterUtility.roundDoubleValue(convertedSongSize, 2);
+        return (Double.toString(convertedSongSizeRounded)) + " MB";
+    }
 }

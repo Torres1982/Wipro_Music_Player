@@ -41,6 +41,7 @@ public class MusicPlayer extends AppCompatActivity {
     final static String MUSIC_TAG = "MUSIC_TAG";
     private static final String ACTION_BAR_CHANNEL_ID = "com.wipro.music.player";
     static final int ACTION_BAR_NOTIFICATION_ID = 100;
+    public static final String PREV_ACTION = "com.marothiatechs.customnotification.action.prev";
     private TextView songTitle, songArtist, songSize, songLength, songTimeElapsed;
     private ImageButton playSong, stopSong, nextSong, previousSong;
     private SeekBar seekBar;
@@ -56,7 +57,7 @@ public class MusicPlayer extends AppCompatActivity {
     private double sizeNewSong;
     private long durationNewSong;
     private Handler musicHandler = new Handler();
-    public static NotificationManagerCompat notificationManager;
+    public static NotificationManager notificationManager;
     private static AudioManager audioManager;
     private static AudioFocusRequest audioFocusRequest;
 
@@ -105,7 +106,6 @@ public class MusicPlayer extends AppCompatActivity {
         showActionBarNotification();
         startPlaying(path);
         controlAudioFocus();
-        startService();
     }
 
     // Listener for Playing the Song Image Button
@@ -171,6 +171,8 @@ public class MusicPlayer extends AppCompatActivity {
         stopSong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                animateButtonClick(stopSong);
+
                 if (mediaPlayer.isPlaying() && mediaPlayer != null) {
                     stopPlaying();
                 }
@@ -180,7 +182,6 @@ public class MusicPlayer extends AppCompatActivity {
 
     // Stop plying a Song
     public void stopPlaying() {
-        animateButtonClick(stopSong);
         showToastMessageAndLogMessageTogether("Playing Song Stopped!");
         playSong.setImageResource(R.drawable.play);
         songTimeElapsed.setText(R.string.initial_timer);
@@ -240,20 +241,13 @@ public class MusicPlayer extends AppCompatActivity {
 
     // Update the song artist, title and the length of the song
     private void updateViewDetails(String artist, String title, double size, long duration) {
-        String stringSongSize = getDoubleToStringValueOfConvertedAndRoundedSongSize(size);
+        String stringSongSize = ConverterUtility.getDoubleToStringValueOfConvertedAndRoundedSongSize(size);
         String songDuration = ConverterUtility.convertMillisecondsToMinutesAndSeconds(duration);
 
         songArtist.setText(artist);
         songTitle.setText(title);
         songSize.setText(stringSongSize);
         songLength.setText(songDuration);
-    }
-
-    // Get the String value of the song size (double)
-    private String getDoubleToStringValueOfConvertedAndRoundedSongSize(double size) {
-        double convertedSongSize = ConverterUtility.convertBytesToMegabytes(size);
-        double convertedSongSizeRounded = ConverterUtility.roundDoubleValue(convertedSongSize, 2);
-        return (Double.toString(convertedSongSizeRounded)) + " MB";
     }
 
     // Updating Seek Bar progress
@@ -378,39 +372,36 @@ public class MusicPlayer extends AppCompatActivity {
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        //NotificationChannel notificationChannel = new NotificationChannel(ACTION_BAR_CHANNEL_ID, "Channel 100", NotificationManager.IMPORTANCE_DEFAULT);
-        //notificationChannel.setSound(null, null);
-        notificationManager = NotificationManagerCompat.from(this);
-        //assert notificationManager != null;
-        //notificationManager.createNotificationChannel(notificationChannel);
+        NotificationChannel notificationChannel = new NotificationChannel(ACTION_BAR_CHANNEL_ID, "Channel 100", NotificationManager.IMPORTANCE_HIGH);
+        notificationChannel.setSound(null, null);
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        assert notificationManager != null;
+        notificationManager.createNotificationChannel(notificationChannel);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, ACTION_BAR_CHANNEL_ID);
 
         //RemoteViews notificationCompact = new RemoteViews(getPackageName(), R.layout.notification_compact);
-        //RemoteViews notificationExpanded = new RemoteViews(getPackageName(), R.layout.music_player);
+        //RemoteViews notificationExpanded = new RemoteViews(getPackageName(), R.layout.notification_expanded);
+
+        Intent previousIntent = new Intent(this, MusicPlayer.class);
+        previousIntent.setAction(PREV_ACTION);
+        PendingIntent pendingPreviousIntent = PendingIntent.getService(this, 1, previousIntent, 0);
+
+        NotificationCompat.Action actionPrevious = new NotificationCompat.Action.Builder(R.drawable.previous, "Previous", pendingPreviousIntent).build();
 
         notificationBuilder
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setVisibility(Notification.VISIBILITY_PUBLIC)
             .setContentTitle(songTitle)
             .setContentText(songArtist)
             .setContentIntent(pendingIntent)
             //.setCustomContentView(notificationCompact)
             //.setCustomBigContentView(notificationExpanded)
             .setSmallIcon(R.drawable.icon_notification)
-            .setLargeIcon(decodeResource(getResources(), R.drawable.icon_notification))
-                .setStyle(new NotificationCompat.BigPictureStyle()
-                        .bigPicture(decodeResource(getResources(), R.drawable.icon_notification))
-                        .bigLargeIcon(null))
+            .addAction(actionPrevious)
             .setTicker(songTitle)
             .setOnlyAlertOnce(true)
             .setOngoing(true);
         Notification notification = notificationBuilder.build();
         notificationManager.notify(ACTION_BAR_NOTIFICATION_ID, notification);
-    }
-
-    public void startService() {
-        Intent serviceIntent = new Intent(MusicPlayer.this, NotificationService.class);
-        serviceIntent.setAction(Constants.ACTION.START_FOREGROUND_ACTION);
-        startService(serviceIntent);
     }
 
     // Handles Audio Focus states
@@ -425,25 +416,29 @@ public class MusicPlayer extends AppCompatActivity {
         audioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
                 .setAudioAttributes(audioAttributes)
                 .setAcceptsDelayedFocusGain(true)
+                .setFocusGain(AudioManager.AUDIOFOCUS_GAIN)
                 .setWillPauseWhenDucked(true)
                 .setOnAudioFocusChangeListener(new AudioManager.OnAudioFocusChangeListener() {
                     @Override
                     public void onAudioFocusChange(int focusChange) {
                         if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                            audioManager.abandonAudioFocusRequest(audioFocusRequest);
-                            stopPlaying();
                             Log.i(MusicPlayer.MUSIC_TAG, "Focus Change: Audio Focus Loss.");
+                            stopPlaying();
+                            //audioManager.abandonAudioFocusRequest(audioFocusRequest);
                         } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-                            pausePlaying();
                             Log.i(MusicPlayer.MUSIC_TAG, "Focus Change: Audio Focus Loss Transient.");
+                            pausePlaying();
                         } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-                            mediaPlayer.setVolume(0.2f, 0.2f);
-                            // !!!!!!!!!!!! NEEDS to FIX because song starts playing from the beginning !!!!!!!!!!!!!!!!!!!!
                             Log.i(MusicPlayer.MUSIC_TAG, "Focus Change: Audio Focus Loss Transient Can Duck.");
+                            //mediaPlayer.setVolume(0.2f, 0.2f);
+                            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, 0);
+                            pausePlaying();
                         } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-                            mediaPlayer.setVolume(0.7f, 0.7f);
-                            startPlaying(path);
+                            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0);
                             Log.i(MusicPlayer.MUSIC_TAG, "Focus Change: Audio Focus Gain.");
+                            mediaPlayer.seekTo(songCurrentPosition);
+                            mediaPlayer.start();
+                            //startPlaying(path);
                         }
                     }
                 })
@@ -463,8 +458,14 @@ public class MusicPlayer extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        destroyMusicPlayerActivity();
+    }
+
+    // Destroy Music Player Activity
+    private void destroyMusicPlayerActivity() {
         mediaPlayer.release();
         mediaPlayer = null;
+        audioManager.abandonAudioFocusRequest(audioFocusRequest);
         Log.i(MUSIC_TAG, "Music Player Activity Destroyed!");
     }
 }
