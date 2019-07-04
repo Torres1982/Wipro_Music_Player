@@ -4,8 +4,10 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.AudioAttributes;
@@ -30,6 +32,7 @@ import com.wipro.wipro_music_player.util.ConverterUtility;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MusicPlayer extends AppCompatActivity {
@@ -51,6 +54,12 @@ public class MusicPlayer extends AppCompatActivity {
     public static NotificationManager notificationManager;
     private static AudioManager audioManager;
     private static AudioFocusRequest audioFocusRequest;
+    // Used for Notifications
+    private static ArrayList<String> listOfNotificationActions;
+    private static ArrayList<String> listOfNotificationActionTitles;
+    private static ArrayList<Integer> listOfDrawableImageButtons;
+    private static ArrayList<PendingIntent> listOfNotificationPendingIntents;
+    private static ArrayList<NotificationCompat.Action> listOfNotificationActionBuilders;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +93,16 @@ public class MusicPlayer extends AppCompatActivity {
         seekBar = findViewById(R.id.seek_bar);
         seekBar.setMax(100);
         songTimeElapsed.setText(R.string.initial_timer);
+
+        // Used for Notifications
+        listOfDrawableImageButtons = new ArrayList<>(Arrays.asList(R.drawable.previous, R.drawable.play, R.drawable.stop, R.drawable.next));
+        listOfNotificationActions = new ArrayList<>(Arrays.asList(Constants.NotificationAction.PREVIOUS_SONG_ACTION,
+                                                                  Constants.NotificationAction.PLAY_SONG_ACTION,
+                                                                  Constants.NotificationAction.STOP_SONG_ACTION,
+                                                                  Constants.NotificationAction.NEXT_SONG_ACTION));
+        listOfNotificationActionTitles = new ArrayList<>(Arrays.asList("Previous", "Play", "Stop", "Next"));
+        listOfNotificationPendingIntents = new ArrayList<>();
+        listOfNotificationActionBuilders = new ArrayList<>();
 
         updateViewDetails(artist, title, size, length);
         setSeekBarListener();
@@ -333,70 +352,77 @@ public class MusicPlayer extends AppCompatActivity {
 
     // Create an Action Bar Notification
     public void showActionBarNotification() {
-        String songArtist = listOfSongs.get(songIndex).getArtist();
         String songTitle = listOfSongs.get(songIndex).getTitle();
+        String songArtist = listOfSongs.get(songIndex).getArtist();
 
+        PendingIntent pendingIntent = createNotificationPendingIntent();
+        setUpNotificationChannel();
+        createNotificationActionPendingIntents();
+        createNotificationActionBuilders();
+        createNotificationCompatBuilder(pendingIntent, songTitle, songArtist);
+    }
+
+    // Create the Notification Pending Intent to start the Notification
+    private PendingIntent createNotificationPendingIntent() {
         Intent notificationIntent = new Intent(this, MusicPlayer.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getService(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return PendingIntent.getService(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
 
+    // Prepare the Notification Channel
+    private void setUpNotificationChannel() {
         NotificationChannel notificationChannel = new NotificationChannel(Constants.NotificationIdentifier.NOTIFICATION_CHANNEL_ID, "Channel 100", NotificationManager.IMPORTANCE_HIGH);
         notificationChannel.setSound(null, null);
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         assert notificationManager != null;
         notificationManager.createNotificationChannel(notificationChannel);
+    }
+
+    // Create the Notification Pending Intents to control Notification Actions
+    private void createNotificationActionPendingIntents() {
+        int requestCodeCounter = 0;
+
+        for (String action: listOfNotificationActions) {
+            requestCodeCounter++;
+            Intent intent = new Intent(this, MusicReceiver.class);
+            intent.setAction(action);
+            intent.putExtra(Constants.NotificationAction.NOTIFICATION_ACTION_KEY, action);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCodeCounter, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            listOfNotificationPendingIntents.add(pendingIntent);
+        }
+    }
+
+    // Create the Notification Action Builders
+    private void createNotificationActionBuilders() {
+        int actionCounter = 0;
+
+        for (String title: listOfNotificationActionTitles) {
+            NotificationCompat.Action action = new NotificationCompat.Action.Builder(listOfDrawableImageButtons.get(actionCounter), title, listOfNotificationPendingIntents.get(actionCounter)).build();
+            listOfNotificationActionBuilders.add(action);
+            actionCounter++;
+        }
+    }
+
+    // Create the Main Notification Builder to send Notification/notify()
+    private void createNotificationCompatBuilder(PendingIntent pendingIntent, String songTitle, String songArtist) {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, Constants.NotificationIdentifier.NOTIFICATION_CHANNEL_ID);
-
-        // Send Broadcast for the Previous Song Pending Intent
-        Intent previousSongIntent = new Intent(this, MusicReceiver.class);
-        previousSongIntent.setAction(Constants.NotificationAction.PREVIOUS_SONG_ACTION);
-        previousSongIntent.putExtra(Constants.NotificationAction.NOTIFICATION_ACTION_KEY, Constants.NotificationAction.PREVIOUS_SONG_ACTION);
-        PendingIntent pendingPreviousIntent = PendingIntent.getBroadcast(this, 1, previousSongIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Send Broadcast for the Play Song Pending Intent
-        Intent playSongIntent = new Intent(this, MusicPlayer.class);
-        playSongIntent.setAction(Constants.NotificationAction.PLAY_SONG_ACTION);
-        PendingIntent pendingPlayIntent = PendingIntent.getService(this, 2, playSongIntent, 0);
-
-        // Send Broadcast for the Stop Song Pending Intent
-        Intent stopSongIntent = new Intent(this, MusicPlayer.class);
-        stopSongIntent.setAction(Constants.NotificationAction.STOP_SONG_ACTION);
-        PendingIntent pendingStopIntent = PendingIntent.getService(this, 3, stopSongIntent, 0);
-
-        // Send Broadcast for the Next Song Pending Intent
-        Intent nextSongIntent = new Intent(this, MusicPlayer.class);
-        nextSongIntent.setAction(Constants.NotificationAction.NEXT_SONG_ACTION);
-        PendingIntent pendingNextIntent = PendingIntent.getService(this, 4, nextSongIntent, 0);
-
-        // Build Notification Actions for individual Image Buttons
-        NotificationCompat.Action actionPrevious = new NotificationCompat.Action.Builder(R.drawable.previous, "Previous", pendingPreviousIntent).build();
-        NotificationCompat.Action actionPlay = new NotificationCompat.Action.Builder(R.drawable.play, "Play", pendingPlayIntent).build();
-        NotificationCompat.Action actionStop = new NotificationCompat.Action.Builder(R.drawable.stop, "Stop", pendingStopIntent).build();
-        NotificationCompat.Action actionNext = new NotificationCompat.Action.Builder(R.drawable.next, "Next", pendingNextIntent).build();
-
-//RemoteViews notificationCompact = new RemoteViews(getPackageName(), R.layout.notification_compact);
-//RemoteViews notificationExpanded = new RemoteViews(getPackageName(), R.layout.notification_expanded);
-//notificationCompact.setOnClickPendingIntent(R.id.button_previous, pendingPreviousIntent);
-
         notificationBuilder
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setColor(ContextCompat.getColor(this, R.color.red))
                 .setContentTitle(songTitle)
                 .setContentText(songArtist)
                 .setContentIntent(pendingIntent)
-//.setCustomContentView(notificationCompact)
-//.setCustomBigContentView(notificationExpanded)
                 .setSmallIcon(R.drawable.icon_notification)
                 .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.music))
                 .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(BitmapFactory.decodeResource(getResources(), R.drawable.guitar)))
-                .addAction(actionPrevious)
-                .addAction(actionPlay)
-                //.addAction(actionStop)
-                .addAction(actionNext)
+                .addAction(listOfNotificationActionBuilders.get(0))
+                //.addAction(listOfNotificationActionBuilders.get(1))
+                .addAction(listOfNotificationActionBuilders.get(2))
+                .addAction(listOfNotificationActionBuilders.get(3))
                 .setTicker(songTitle)
                 .setOnlyAlertOnce(true)
                 .setOngoing(true);
-//.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
+        //.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
         Notification notification = notificationBuilder.build();
         notificationManager.notify(Constants.NotificationIdentifier.NOTIFICATION_ID, notification);
     }
@@ -448,6 +474,7 @@ public class MusicPlayer extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         destroyMusicPlayerActivity();
+        audioManager.abandonAudioFocusRequest(audioFocusRequest);
         notificationManager.cancel(Constants.NotificationIdentifier.NOTIFICATION_ID);
     }
 
@@ -455,7 +482,13 @@ public class MusicPlayer extends AppCompatActivity {
     private void destroyMusicPlayerActivity() {
         mediaPlayer.release();
         mediaPlayer = null;
-        audioManager.abandonAudioFocusRequest(audioFocusRequest);
         Log.i(Constants.LogTags.MUSIC_TAG, "Music Player Activity Destroyed!");
     }
 }
+
+// TODO Maybe it needs to be implemented later in showActionBarNotification method
+//RemoteViews notificationCompact = new RemoteViews(getPackageName(), R.layout.notification_compact);
+//RemoteViews notificationExpanded = new RemoteViews(getPackageName(), R.layout.notification_expanded);
+//notificationCompact.setOnClickPendingIntent(R.id.button_previous, pendingPreviousIntent);
+//.setCustomContentView(notificationCompact)
+//.setCustomBigContentView(notificationExpanded)

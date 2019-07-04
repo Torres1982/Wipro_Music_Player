@@ -10,12 +10,13 @@ public class MusicReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getStringExtra(Constants.NotificationAction.NOTIFICATION_ACTION_KEY);
 
+        // TODO Must be fixed for actions to control the Media Player
         switch (action) {
             case Constants.NotificationAction.PREVIOUS_SONG_ACTION:
                 performActionPreviousSong();
                 break;
-            case Constants.NotificationAction.PLAY_SONG_ACTION:
-                performActionPlaySong();
+            case Constants.NotificationAction.STOP_SONG_ACTION:
+                performActionStopSong();
                 break;
             case Constants.NotificationAction.NEXT_SONG_ACTION:
                 performActionNextSong();
@@ -24,40 +25,19 @@ public class MusicReceiver extends BroadcastReceiver {
                 Log.i(Constants.LogTags.MUSIC_TAG, "Default Broadcast Receiver Action!");
         }
 
-        Intent closeNotificationTrayIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-        context.sendBroadcast(closeNotificationTrayIntent);
+        //Intent closeNotificationTrayIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+        //context.sendBroadcast(closeNotificationTrayIntent);
     }
 
-    public void performActionPreviousSong() {
+    public static void performActionPreviousSong() {
         Log.i(Constants.LogTags.MUSIC_TAG, "Action 1 from Receiver!");
     }
 
-    public void performActionPlaySong() {
+    public static void performActionStopSong() {
         Log.i(Constants.LogTags.MUSIC_TAG, "Action 2 from Receiver!");
     }
 
-    public void performActionNextSong() {
+    public static void performActionNextSong() {
         Log.i(Constants.LogTags.MUSIC_TAG, "Action 3 from Receiver!");
     }
 }
-
-//    public static void createNotif(Context context){
-//
-//    ...
-//        //This is the intent of PendingIntent
-//        Intent intentAction = new Intent(context,ActionReceiver.class);
-//
-//        //This is optional if you have more than one buttons and want to differentiate between two
-//        intentAction.putExtra("action","actionName");
-//
-//        pIntentlogin = PendingIntent.getBroadcast(context,1,intentAction,PendingIntent.FLAG_UPDATE_CURRENT);
-//        drivingNotifBldr = (NotificationCompat.Builder) new NotificationCompat.Builder(context)
-//                .setSmallIcon(R.drawable.steeringwheel)
-//                .setContentTitle("NoTextZone")
-//                .setContentText("Driving mode it ON!")
-//                //Using this action button I would like to call logTest
-//                .addAction(R.drawable.smallmanwalking, "Turn OFF driving mode", pIntentlogin)
-//                .setOngoing(true);
-//    ...
-//
-//    }

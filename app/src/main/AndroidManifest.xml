@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".MusicPlayer" />
-        <receiver android:name=".MusicReceiver" />
+        <receiver android:name=".MusicReceiver"></receiver>
     </application>
 
 </manifest>
