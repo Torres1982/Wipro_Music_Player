@@ -347,23 +347,23 @@ public class MusicPlayer extends AppCompatActivity {
         notificationManager.createNotificationChannel(notificationChannel);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, Constants.NotificationIdentifier.NOTIFICATION_CHANNEL_ID);
 
-//RemoteViews notificationCompact = new RemoteViews(getPackageName(), R.layout.notification_compact);
-//RemoteViews notificationExpanded = new RemoteViews(getPackageName(), R.layout.notification_expanded);
-
-        Intent previousSongIntent = new Intent(this, MusicPlayer.class);
+        // Send Broadcast for the Previous Song Pending Intent
+        Intent previousSongIntent = new Intent(this, MusicReceiver.class);
         previousSongIntent.setAction(Constants.NotificationAction.PREVIOUS_SONG_ACTION);
-        PendingIntent pendingPreviousIntent = PendingIntent.getService(this, 1, previousSongIntent, 0);
+        previousSongIntent.putExtra(Constants.NotificationAction.NOTIFICATION_ACTION_KEY, Constants.NotificationAction.PREVIOUS_SONG_ACTION);
+        PendingIntent pendingPreviousIntent = PendingIntent.getBroadcast(this, 1, previousSongIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-//notificationCompact.setOnClickPendingIntent(R.id.button_previous, pendingPreviousIntent);
-
+        // Send Broadcast for the Play Song Pending Intent
         Intent playSongIntent = new Intent(this, MusicPlayer.class);
         playSongIntent.setAction(Constants.NotificationAction.PLAY_SONG_ACTION);
         PendingIntent pendingPlayIntent = PendingIntent.getService(this, 2, playSongIntent, 0);
 
+        // Send Broadcast for the Stop Song Pending Intent
         Intent stopSongIntent = new Intent(this, MusicPlayer.class);
         stopSongIntent.setAction(Constants.NotificationAction.STOP_SONG_ACTION);
         PendingIntent pendingStopIntent = PendingIntent.getService(this, 3, stopSongIntent, 0);
 
+        // Send Broadcast for the Next Song Pending Intent
         Intent nextSongIntent = new Intent(this, MusicPlayer.class);
         nextSongIntent.setAction(Constants.NotificationAction.NEXT_SONG_ACTION);
         PendingIntent pendingNextIntent = PendingIntent.getService(this, 4, nextSongIntent, 0);
@@ -373,6 +373,10 @@ public class MusicPlayer extends AppCompatActivity {
         NotificationCompat.Action actionPlay = new NotificationCompat.Action.Builder(R.drawable.play, "Play", pendingPlayIntent).build();
         NotificationCompat.Action actionStop = new NotificationCompat.Action.Builder(R.drawable.stop, "Stop", pendingStopIntent).build();
         NotificationCompat.Action actionNext = new NotificationCompat.Action.Builder(R.drawable.next, "Next", pendingNextIntent).build();
+
+//RemoteViews notificationCompact = new RemoteViews(getPackageName(), R.layout.notification_compact);
+//RemoteViews notificationExpanded = new RemoteViews(getPackageName(), R.layout.notification_expanded);
+//notificationCompact.setOnClickPendingIntent(R.id.button_previous, pendingPreviousIntent);
 
         notificationBuilder
                 .setVisibility(Notification.VISIBILITY_PUBLIC)

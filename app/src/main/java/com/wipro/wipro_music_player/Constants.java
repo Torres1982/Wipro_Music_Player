@@ -10,15 +10,16 @@ public class Constants {
 
     // Holds corresponding Constants for Actions used by the Notification's Image Buttons
     public interface NotificationAction {
-        String PREVIOUS_SONG_ACTION = "com.marothiatechs.customnotification.action.prev";
-        String PLAY_SONG_ACTION = "com.marothiatechs.customnotification.action.play";
-        String STOP_SONG_ACTION = "com.marothiatechs.customnotification.action.stop";
-        String NEXT_SONG_ACTION = "com.marothiatechs.customnotification.action.next";
+        String NOTIFICATION_ACTION_KEY = "action";
+        String PREVIOUS_SONG_ACTION = NotificationIdentifier.NOTIFICATION_CHANNEL_ID + "." + NOTIFICATION_ACTION_KEY + ".prev";
+        String PLAY_SONG_ACTION = NotificationIdentifier.NOTIFICATION_CHANNEL_ID + "." + NOTIFICATION_ACTION_KEY + ".play";
+        String STOP_SONG_ACTION = NotificationIdentifier.NOTIFICATION_CHANNEL_ID + "." + NOTIFICATION_ACTION_KEY + ".stop";
+        String NEXT_SONG_ACTION = NotificationIdentifier.NOTIFICATION_CHANNEL_ID + "." + NOTIFICATION_ACTION_KEY + ".next";
     }
 
     // Holds any corresponding Constants for Notification id's
     public interface NotificationIdentifier {
         int NOTIFICATION_ID = 100;
-        String NOTIFICATION_CHANNEL_ID = "com.wipro.torres.wipro_music_player";
+        String NOTIFICATION_CHANNEL_ID = "com.wipro.torres.music_player";
     }
 }

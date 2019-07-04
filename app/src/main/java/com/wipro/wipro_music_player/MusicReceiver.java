@@ -8,7 +8,7 @@ import android.util.Log;
 public class MusicReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        String action = intent.getStringExtra("action");
+        String action = intent.getStringExtra(Constants.NotificationAction.NOTIFICATION_ACTION_KEY);
 
         switch (action) {
             case Constants.NotificationAction.PREVIOUS_SONG_ACTION:
@@ -28,9 +28,17 @@ public class MusicReceiver extends BroadcastReceiver {
         context.sendBroadcast(closeNotificationTrayIntent);
     }
 
-    public void performActionPreviousSong() { }
-    public void performActionPlaySong() { }
-    public void performActionNextSong() { }
+    public void performActionPreviousSong() {
+        Log.i(Constants.LogTags.MUSIC_TAG, "Action 1 from Receiver!");
+    }
+
+    public void performActionPlaySong() {
+        Log.i(Constants.LogTags.MUSIC_TAG, "Action 2 from Receiver!");
+    }
+
+    public void performActionNextSong() {
+        Log.i(Constants.LogTags.MUSIC_TAG, "Action 3 from Receiver!");
+    }
 }
 
 //    public static void createNotif(Context context){
