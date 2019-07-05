@@ -1,20 +1,24 @@
 <resources>
     <!-- Base Application Theme -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize the Theme -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:fontFamily">@font/casper_regular</item>
         <item name="fontFamily">@font/casper_regular</item>
+        <!-- Customize the Action Bar -->
+        <item name="actionBarStyle">@style/CustomActionBar</item>
     </style>
 
-    <!-- Customize the Action Bar -->
-    <style name="Dark.Overlay" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:background">@color/red</item>
+    <!-- Set the Background Color of the Bar to red -->
+    <style name="CustomActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="background">@color/red</item>
+        <item name="titleTextStyle">@style/CustomActionBarTitle</item>
     </style>
 
-    <style name="Dark.Overlay.LightPopup" parent="ThemeOverlay.AppCompat.Light">
-        <item name="android:background">@color/cyan</item>
+    <!-- Set the Title Text Color of the Bar to white -->
+    <style name="CustomActionBarTitle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/light_green</item>
     </style>
 </resources>

@@ -14,11 +14,15 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
@@ -53,12 +57,15 @@ public class MusicPlayer extends AppCompatActivity {
     public static NotificationManager notificationManager;
     private static AudioManager audioManager;
     private static AudioFocusRequest audioFocusRequest;
-    // Used for Notifications
+    private ConstraintLayout constraintLayout;
+    // Notifications
     private static ArrayList<String> listOfNotificationActions;
     private static ArrayList<String> listOfNotificationActionTitles;
     private static ArrayList<Integer> listOfDrawableImageButtons;
     private static ArrayList<PendingIntent> listOfNotificationPendingIntents;
     private static ArrayList<NotificationCompat.Action> listOfNotificationActionBuilders;
+    // Action Bar Menu Items
+    private MenuItem itemDefaultTheme ,itemLightTheme, itemDarkTheme, itemTags, itemFavourites, itemAbout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,9 +84,6 @@ public class MusicPlayer extends AppCompatActivity {
 
         listOfSongs = MusicListActivity.musicList;
         mediaPlayer = new MediaPlayer();
-        // Set customized Action Bar
-        //Toolbar myToolbar = findViewById(R.id.action_bar_toolbar);
-        //setSupportActionBar(myToolbar);
 
         songArtist = findViewById(R.id.music_artist);
         songTitle = findViewById(R.id.music_title);
@@ -92,6 +96,14 @@ public class MusicPlayer extends AppCompatActivity {
         previousSong = findViewById(R.id.button_previous);
         shuffleSongsSwitch = findViewById(R.id.switch_shuffle);
         repeatSongSwitch = findViewById(R.id.switch_repeat);
+        constraintLayout = findViewById(R.id.music_player_main_layout);
+        // Action Bar Menu Items
+        itemDefaultTheme = findViewById(R.id.item_default_theme);
+        itemLightTheme = findViewById(R.id.item_light_theme);
+        itemDarkTheme = findViewById(R.id.item_dark_theme);
+        itemTags = findViewById(R.id.item_tags);
+        itemFavourites = findViewById(R.id.item_favourites);
+        itemAbout = findViewById(R.id.item_about);
 
         seekBar = findViewById(R.id.seek_bar);
         seekBar.setMax(100);
@@ -119,6 +131,50 @@ public class MusicPlayer extends AppCompatActivity {
         showActionBarNotification();
         controlAudioFocus();
         startPlaying(path);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu, menu);
+        super.onCreateOptionsMenu(menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item_default_theme:
+                setSelectedThemes();
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Default Theme selected!");
+                break;
+            case R.id.item_light_theme:
+                setSelectedThemes();
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Light Theme selected!");
+                break;
+            case R.id.item_dark_theme:
+                setSelectedThemes();
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Dark Theme selected!");
+                break;
+            case R.id.item_tags:
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Update Tags selected!");
+                break;
+            case R.id.item_favourites:
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Favourites selected!");
+                break;
+            case R.id.item_about:
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu About selected!");
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    // Set the Light or Dark Theme from the Menu Selection
+    private void setSelectedThemes() {
+        //constraintLayout.setBackgroundColor(getResources().getColor(R.color.yellow));
+        ViewCompat.setBackgroundTintList(constraintLayout, ContextCompat.getColorStateList(this, R.color.yellow));
     }
 
     // Listener for Playing the Song Image Button

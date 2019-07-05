@@ -3,13 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/music_player_main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/light_green"
     tools:context=".MusicPlayer">
-
-    <include
-        android:id="@+id/action_bar_toolbar"
-        layout="@layout/action_bar_toolbar" />
 
     <TextView
         android:id="@+id/music_title"
@@ -17,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_twenty"
         android:layout_marginEnd="@dimen/margin_twenty"
-        android:layout_marginTop="@dimen/margin_twenty"
+        android:layout_marginTop="@dimen/margin_sixty"
         android:layout_marginBottom="@dimen/margin_twenty"
         android:gravity="center"
         android:textSize="@dimen/text_title_twenty_two"
