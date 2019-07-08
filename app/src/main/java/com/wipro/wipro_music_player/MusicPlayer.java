@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
@@ -188,6 +189,9 @@ public class MusicPlayer extends AppCompatActivity {
         ViewCompat.setBackgroundTintList(constraintLayout, ContextCompat.getColorStateList(this, backgroundColour));
         setColourForTextViews(textColour);
         setColourForSwitches(textColour);
+
+        //seekBar.getProgressDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
+        //seekBar.getThumb().setColorFilter(yellowColour, PorterDuff.Mode.SRC_ATOP);
     }
 
     // Control the Colours for the Text Views

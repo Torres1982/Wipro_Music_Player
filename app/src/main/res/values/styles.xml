@@ -9,6 +9,8 @@
         <item name="fontFamily">@font/casper_regular</item>
         <!-- Customize the Action Bar -->
         <item name="actionBarStyle">@style/CustomActionBar</item>
+        <!-- Set the Menu Bar Colours -->
+        <item name="android:itemBackground">@color/yellow</item>
     </style>
 
     <!-- Set the Background Color of the Bar to red -->
