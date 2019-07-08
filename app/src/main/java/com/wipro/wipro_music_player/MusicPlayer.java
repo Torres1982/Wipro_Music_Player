@@ -14,6 +14,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.ColorInt;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
@@ -65,7 +66,9 @@ public class MusicPlayer extends AppCompatActivity {
     private static ArrayList<PendingIntent> listOfNotificationPendingIntents;
     private static ArrayList<NotificationCompat.Action> listOfNotificationActionBuilders;
     // Action Bar Menu Items
-    private MenuItem itemDefaultTheme ,itemLightTheme, itemDarkTheme, itemTags, itemFavourites, itemAbout;
+    private MenuItem itemDefaultTheme, itemDarkTheme, itemTags, itemFavourites, itemAbout;
+    private boolean isDefaultThemeOn, isDarkThemeOn;
+    private int greyColour, redColour, yellowColour, lightGreenColour, blackColour;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,12 +102,21 @@ public class MusicPlayer extends AppCompatActivity {
         constraintLayout = findViewById(R.id.music_player_main_layout);
         // Action Bar Menu Items
         itemDefaultTheme = findViewById(R.id.item_default_theme);
-        itemLightTheme = findViewById(R.id.item_light_theme);
         itemDarkTheme = findViewById(R.id.item_dark_theme);
         itemTags = findViewById(R.id.item_tags);
         itemFavourites = findViewById(R.id.item_favourites);
         itemAbout = findViewById(R.id.item_about);
+        isDefaultThemeOn = true;
+        isDarkThemeOn = false;
 
+        // Assign Colours
+        greyColour = R.color.grey;
+        redColour = R.color.red;
+        yellowColour = R.color.yellow;
+        lightGreenColour = R.color.light_green;
+        blackColour = R.color.black;
+
+        // Seek Bar
         seekBar = findViewById(R.id.seek_bar);
         seekBar.setMax(100);
         songTimeElapsed.setText(R.string.initial_timer);
@@ -145,15 +157,15 @@ public class MusicPlayer extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_default_theme:
-                setSelectedThemes();
+                setSelectedThemes(lightGreenColour, redColour);
+                isDefaultThemeOn = true;
+                isDarkThemeOn = false;
                 Log.i(Constants.LogTags.MUSIC_TAG, "Menu Default Theme selected!");
                 break;
-            case R.id.item_light_theme:
-                setSelectedThemes();
-                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Light Theme selected!");
-                break;
             case R.id.item_dark_theme:
-                setSelectedThemes();
+                setSelectedThemes(blackColour, yellowColour);
+                isDefaultThemeOn = false;
+                isDarkThemeOn = true;
                 Log.i(Constants.LogTags.MUSIC_TAG, "Menu Dark Theme selected!");
                 break;
             case R.id.item_tags:
@@ -172,9 +184,33 @@ public class MusicPlayer extends AppCompatActivity {
     }
 
     // Set the Light or Dark Theme from the Menu Selection
-    private void setSelectedThemes() {
-        //constraintLayout.setBackgroundColor(getResources().getColor(R.color.yellow));
-        ViewCompat.setBackgroundTintList(constraintLayout, ContextCompat.getColorStateList(this, R.color.yellow));
+    private void setSelectedThemes(int backgroundColour, int textColour) {
+        ViewCompat.setBackgroundTintList(constraintLayout, ContextCompat.getColorStateList(this, backgroundColour));
+        setColourForTextViews(textColour);
+        setColourForSwitches(textColour);
+    }
+
+    // Control the Colours for the Text Views
+    private void setColourForTextViews(int textColour) {
+        ArrayList<TextView> listOfTextViews = new ArrayList<>(Arrays.asList(songArtist, songTitle, songSize, songLength, songTimeElapsed));
+
+        for (TextView textView: listOfTextViews) {
+            textView.setTextColor(ContextCompat.getColor(this, textColour));
+        }
+    }
+
+    // Control the Colours for the Switches
+    private void setColourForSwitches(int textColour) {
+        if (isShuffleSongsSwitchOn) {
+            shuffleSongsSwitch.setTextColor(ContextCompat.getColor(this, textColour));
+            repeatSongSwitch.setTextColor(ContextCompat.getColor(this, greyColour));
+        } else if (isRepeatSongSwitchOn) {
+            repeatSongSwitch.setTextColor(ContextCompat.getColor(this, textColour));
+            shuffleSongsSwitch.setTextColor(ContextCompat.getColor(this, greyColour));
+        } else {
+            repeatSongSwitch.setTextColor(ContextCompat.getColor(this, greyColour));
+            shuffleSongsSwitch.setTextColor(ContextCompat.getColor(this, greyColour));
+        }
     }
 
     // Listener for Playing the Song Image Button
@@ -398,13 +434,21 @@ public class MusicPlayer extends AppCompatActivity {
 
     // Handles common functionality for Shuffle and Repeat Song Listeners
     private void handleShuffleAndRepeatSongsListeners(boolean isChecked, String messageOn, String messageOff, Switch switchOne, Switch switchTwo) {
+        int textColour = ContextCompat.getColor(this, redColour);
+
+        if (isDefaultThemeOn) {
+            textColour = ContextCompat.getColor(this, redColour);
+        } else if (isDarkThemeOn) {
+            textColour = ContextCompat.getColor(this, yellowColour);
+        }
+
         if (isChecked) {
             showToastMessageAndLogMessageTogether(messageOn);
-            switchOne.setTextColor(Color.rgb(255, 0, 0));
+            switchOne.setTextColor(textColour);
             switchTwo.setChecked(false);
         } else {
             showToastMessageAndLogMessageTogether(messageOff);
-            switchOne.setTextColor(Color.rgb(168, 168, 168));
+            switchOne.setTextColor(ContextCompat.getColor(this, greyColour));
         }
         Log.i(Constants.LogTags.MUSIC_TAG, "Shuffle Switch: " + isShuffleSongsSwitchOn + ". Repeat Switch: " + isRepeatSongSwitchOn);
     }
