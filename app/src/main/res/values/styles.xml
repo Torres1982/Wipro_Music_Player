@@ -9,6 +9,8 @@
         <item name="fontFamily">@font/casper_regular</item>
         <!-- Customize the Action Bar -->
         <item name="actionBarStyle">@style/CustomActionBar</item>
+        <!-- Customize the Divider for Menu Items -->
+        <item name="android:dropDownListViewStyle">@style/ActionBarMenuDivider</item>
     </style>
 
     <!-- Set the Background Color of the Bar to red -->
@@ -18,7 +20,7 @@
         <item name="popupTheme">@style/ActionBarMenu</item>
     </style>
 
-    <!-- Set the Title Text Color of the Bar to white -->
+    <!-- Set the Title Text Color of the Bar to light color -->
     <style name="CustomActionBarTitle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
         <item name="android:textColor">@color/light_green</item>
     </style>
@@ -27,5 +29,11 @@
     <style name="ActionBarMenu">
         <item name="android:textColor">@color/light_green</item>
         <item name="android:background">@color/red</item>
+    </style>
+
+    <!-- Set Up the Divider for Menu Items -->
+    <style name="ActionBarMenuDivider" parent="@style/Widget.AppCompat.ListView.DropDown">
+        <item name="android:divider">@color/light_green</item>
+        <item name="android:dividerHeight">@dimen/menu_items_divider</item>
     </style>
 </resources>

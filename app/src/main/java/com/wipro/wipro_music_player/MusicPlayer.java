@@ -19,6 +19,8 @@ import android.support.annotation.ColorInt;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -150,6 +152,7 @@ public class MusicPlayer extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.menu, menu);
+        //MenuCompat.setGroupDividerEnabled(menu, true);
         super.onCreateOptionsMenu(menu);
         return true;
     }

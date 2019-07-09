@@ -5,32 +5,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MusicPlayer">
 
-    <item
-        android:id="@+id/item_theme"
-        android:title="@string/item_theme"
-        app:showAsAction="never">
-        <menu>
-            <item
-                android:id="@+id/item_default_theme"
-                android:title="@string/default_theme"
-                app:showAsAction="never" />
+    <group
+        android:id="@+id/group_themes">
+        <item
+            android:id="@+id/item_theme"
+            android:title="@string/item_theme"
+            app:showAsAction="never">
+            <menu>
+                <item
+                    android:id="@+id/item_default_theme"
+                    android:title="@string/default_theme"
+                    app:showAsAction="never" />
 
-            <item
-                android:id="@+id/item_dark_theme"
-                android:title="@string/item_dark_theme"
-                app:showAsAction="never" />
-        </menu>
-    </item>
+                <item
+                    android:id="@+id/item_dark_theme"
+                    android:title="@string/item_dark_theme"
+                    app:showAsAction="never" />
+            </menu>
+        </item>
+    </group>
 
-    <item
-        android:id="@+id/item_tags"
-        android:title="@string/item_tags"
-        app:showAsAction="never" />
+    <group
+        android:id="@+id/group_fancy">
+        <item
+            android:id="@+id/item_tags"
+            android:title="@string/item_tags"
+            app:showAsAction="never" />
 
-    <item
-        android:id="@+id/item_favourites"
-        android:title="@string/item_favourites"
-        app:showAsAction="never"/>
+        <item
+            android:id="@+id/item_favourites"
+            android:title="@string/item_favourites"
+            app:showAsAction="never"/>
+    </group>
 
     <item
         android:id="@+id/item_about"
