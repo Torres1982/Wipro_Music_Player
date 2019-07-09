@@ -43,7 +43,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MusicPlayer extends AppCompatActivity {
-    private TextView songTitle, songArtist, songSize, songLength, songTimeElapsed;
+    private TextView songTitle, songArtist, songSize, songLength, songTimeElapsed, footer;
     private ImageButton playSong, stopSong, nextSong, previousSong;
     private SeekBar seekBar;
     private Switch shuffleSongsSwitch, repeatSongSwitch;
@@ -96,6 +96,7 @@ public class MusicPlayer extends AppCompatActivity {
         songSize = findViewById(R.id.music_size);
         songLength = findViewById(R.id.music_length);
         songTimeElapsed = findViewById(R.id.time_elapsed);
+        footer = findViewById(R.id.footer_text);
         playSong = findViewById(R.id.button_play);
         stopSong = findViewById(R.id.button_stop);
         nextSong = findViewById(R.id.button_next);
@@ -134,6 +135,9 @@ public class MusicPlayer extends AppCompatActivity {
         listOfNotificationPendingIntents = new ArrayList<>();
         listOfNotificationActionBuilders = new ArrayList<>();
 
+        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.translate);
+        footer.startAnimation(animation);
+
         updateViewDetails(artist, title, size, length);
         setSeekBarListener();
         setPlaySongListener();
@@ -152,7 +156,6 @@ public class MusicPlayer extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.menu, menu);
-        //MenuCompat.setGroupDividerEnabled(menu, true);
         super.onCreateOptionsMenu(menu);
         return true;
     }
@@ -199,7 +202,7 @@ public class MusicPlayer extends AppCompatActivity {
 
     // Control the Colours for the Text Views
     private void setColourForTextViews(int textColour) {
-        ArrayList<TextView> listOfTextViews = new ArrayList<>(Arrays.asList(songArtist, songTitle, songSize, songLength, songTimeElapsed));
+        ArrayList<TextView> listOfTextViews = new ArrayList<>(Arrays.asList(songArtist, songTitle, songSize, songLength, songTimeElapsed, footer));
 
         for (TextView textView: listOfTextViews) {
             textView.setTextColor(ContextCompat.getColor(this, textColour));

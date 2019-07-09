@@ -11,4 +11,5 @@
     <string name="item_tags">Update Tags</string>
     <string name="item_favourites">Add to Favourites</string>
     <string name="item_about">About</string>
+    <string name="footer_text">Arturro Torres | Wipro</string>
 </resources>

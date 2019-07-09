@@ -187,4 +187,17 @@
         app:layout_constraintStart_toEndOf="@id/switch_shuffle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/button_previous" />
+
+    <TextView
+        android:id="@+id/footer_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/footer_text"
+        android:textSize="@dimen/text_eighteen"
+        android:textColor="@color/red"
+        android:layout_marginTop="@dimen/margin_sixty"
+        app:layout_constraintEnd_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/switch_repeat" />
 </android.support.constraint.ConstraintLayout>
