@@ -87,13 +87,13 @@ public class MusicListActivity extends AppCompatActivity {
                 songModel.setSize(size);
                 listOfSongs.add(songModel);
 
-                Log.i(MusicPlayer.MUSIC_TAG, "ARTIST: " + artist + ". TITLE: " + title + ". LENGTH: " + duration + ". SIZE: " + size + ". PATH: " + path);
+                Log.i(Constants.LogTags.MUSIC_TAG, "ARTIST: " + artist + ". TITLE: " + title + ". LENGTH: " + duration + ". SIZE: " + size + ". PATH: " + path);
             }
             cursor.close();
         } else {
             String message = "Music List is Empty!";
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-            Log.i(MusicPlayer.MUSIC_TAG, message);
+            Log.i(Constants.LogTags.MUSIC_TAG, message);
         }
         return listOfSongs;
     }
@@ -101,6 +101,6 @@ public class MusicListActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        MusicPlayer.notificationManager.cancel(MusicPlayer.ACTION_BAR_NOTIFICATION_ID);
+        Log.i(Constants.LogTags.MUSIC_TAG, "Application Has Closed!");
     }
 }

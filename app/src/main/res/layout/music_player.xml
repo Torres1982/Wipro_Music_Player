@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/music_player_main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/light_green"
     tools:context=".MusicPlayer">
 
     <TextView
@@ -12,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_twenty"
         android:layout_marginEnd="@dimen/margin_twenty"
-        android:layout_marginTop="@dimen/margin_twenty"
+        android:layout_marginTop="@dimen/margin_sixty"
         android:layout_marginBottom="@dimen/margin_twenty"
         android:gravity="center"
         android:textSize="@dimen/text_title_twenty_two"
@@ -79,6 +82,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="@dimen/text_eighteen"
+        android:textColor="@color/red"
         android:layout_marginStart="@dimen/margin_sixty"
         app:layout_constraintEnd_toStartOf="@id/time_elapsed"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,6 +93,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/text_eighteen"
+        android:textColor="@color/red"
         android:layout_marginEnd="@dimen/margin_sixty"
         android:textAlignment="viewEnd"
         app:layout_constraintEnd_toEndOf="parent"
@@ -182,4 +187,17 @@
         app:layout_constraintStart_toEndOf="@id/switch_shuffle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/button_previous" />
+
+    <TextView
+        android:id="@+id/footer_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/footer_text"
+        android:textSize="@dimen/text_eighteen"
+        android:textColor="@color/red"
+        android:layout_marginTop="@dimen/margin_sixty"
+        app:layout_constraintEnd_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/switch_repeat" />
 </android.support.constraint.ConstraintLayout>

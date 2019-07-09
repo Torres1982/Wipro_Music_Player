@@ -3,13 +3,20 @@ package com.wipro.wipro_music_player.util;
 import java.util.Random;
 
 public class ConverterUtility {
+    // Get the String value of the song size (double)
+    public static String getDoubleToStringValueOfConvertedAndRoundedSongSize(double size) {
+        double convertedSongSize = ConverterUtility.convertBytesToMegabytes(size);
+        double convertedSongSizeRounded = ConverterUtility.roundDoubleValue(convertedSongSize, 2);
+        return (Double.toString(convertedSongSizeRounded)) + " MB";
+    }
+
     // Converting Bytes to MegaBytes
-    public static double convertBytesToMegabytes(double size) {
+    private static double convertBytesToMegabytes(double size) {
         return size / (1024 * 1024);
     }
 
     // Round the Double value to a specific number of decimal places
-    public static double roundDoubleValue(double value, int decimalPlaces) {
+    private static double roundDoubleValue(double value, int decimalPlaces) {
         double scale = Math.pow(10, decimalPlaces);
         return Math.round(value * scale) / scale;
     }

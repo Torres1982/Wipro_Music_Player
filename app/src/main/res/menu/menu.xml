@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MusicPlayer">
+
+    <group
+        android:id="@+id/group_themes">
+        <item
+            android:id="@+id/item_theme"
+            android:title="@string/item_theme"
+            app:showAsAction="never">
+            <menu>
+                <item
+                    android:id="@+id/item_default_theme"
+                    android:title="@string/default_theme"
+                    app:showAsAction="never" />
+
+                <item
+                    android:id="@+id/item_dark_theme"
+                    android:title="@string/item_dark_theme"
+                    app:showAsAction="never" />
+            </menu>
+        </item>
+    </group>
+
+    <group
+        android:id="@+id/group_fancy">
+        <item
+            android:id="@+id/item_tags"
+            android:title="@string/item_tags"
+            app:showAsAction="never" />
+
+        <item
+            android:id="@+id/item_favourites"
+            android:title="@string/item_favourites"
+            app:showAsAction="never"/>
+    </group>
+
+    <item
+        android:id="@+id/item_about"
+        android:title="@string/item_about"
+        app:showAsAction="never" />
+</menu>

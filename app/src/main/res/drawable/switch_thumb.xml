@@ -7,6 +7,9 @@
             android:visible="true"
             android:dither="true"
             android:useLevel="false">
+            <stroke
+                android:color="@color/black"
+                android:width="@dimen/size_one" />
             <gradient
                 android:startColor="@color/red"
                 android:endColor="@color/red"

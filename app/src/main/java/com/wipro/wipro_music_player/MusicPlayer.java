@@ -6,24 +6,31 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.Icon;
+import android.graphics.PorterDuff;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.ColorInt;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.MenuCompat;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.RemoteViews;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -33,15 +40,11 @@ import com.wipro.wipro_music_player.util.ConverterUtility;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import static android.graphics.BitmapFactory.decodeResource;
-
 public class MusicPlayer extends AppCompatActivity {
-    final static String MUSIC_TAG = "MUSIC_TAG";
-    private static final String ACTION_BAR_CHANNEL_ID = "com.wipro.music.player";
-    static final int ACTION_BAR_NOTIFICATION_ID = 100;
-    private TextView songTitle, songArtist, songSize, songLength, songTimeElapsed;
+    private TextView songTitle, songArtist, songSize, songLength, songTimeElapsed, footer;
     private ImageButton playSong, stopSong, nextSong, previousSong;
     private SeekBar seekBar;
     private Switch shuffleSongsSwitch, repeatSongSwitch;
@@ -50,15 +53,25 @@ public class MusicPlayer extends AppCompatActivity {
     private String path;
     private int songIndex;
     private int songCurrentPosition;
+    private int animationScale;
     private List<SongModel> listOfSongs = new ArrayList<>();
     private String artistNewSong;
     private String titleNewSong;
     private double sizeNewSong;
     private long durationNewSong;
     private Handler musicHandler = new Handler();
-    public static NotificationManagerCompat notificationManager;
+    public static NotificationManager notificationManager;
     private static AudioManager audioManager;
     private static AudioFocusRequest audioFocusRequest;
+    private ConstraintLayout constraintLayout;
+    // Notifications
+    private static ArrayList<String> listOfNotificationActions;
+    private static ArrayList<String> listOfNotificationActionTitles;
+    private static ArrayList<Integer> listOfDrawableImageButtons;
+    private static ArrayList<PendingIntent> listOfNotificationPendingIntents;
+    private static ArrayList<NotificationCompat.Action> listOfNotificationActionBuilders;
+    private boolean isDefaultThemeOn, isDarkThemeOn;
+    private int greyColour, redColour, yellowColour, lightGreenColour;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,16 +96,49 @@ public class MusicPlayer extends AppCompatActivity {
         songSize = findViewById(R.id.music_size);
         songLength = findViewById(R.id.music_length);
         songTimeElapsed = findViewById(R.id.time_elapsed);
+        footer = findViewById(R.id.footer_text);
         playSong = findViewById(R.id.button_play);
         stopSong = findViewById(R.id.button_stop);
         nextSong = findViewById(R.id.button_next);
         previousSong = findViewById(R.id.button_previous);
         shuffleSongsSwitch = findViewById(R.id.switch_shuffle);
         repeatSongSwitch = findViewById(R.id.switch_repeat);
+        constraintLayout = findViewById(R.id.music_player_main_layout);
+        // Action Bar Menu Items
+        MenuItem itemDefaultTheme = findViewById(R.id.item_default_theme);
+        MenuItem itemDarkTheme = findViewById(R.id.item_dark_theme);
+        MenuItem itemTags = findViewById(R.id.item_tags);
+        MenuItem itemFavourites = findViewById(R.id.item_favourites);
+        MenuItem itemAbout = findViewById(R.id.item_about);
+        isDefaultThemeOn = true;
+        isDarkThemeOn = false;
+
+        // Assign Colours
+        greyColour = R.color.grey;
+        redColour = R.color.red;
+        yellowColour = R.color.yellow;
+        lightGreenColour = R.color.light_green;
+
+        // Assign Animations
+        animationScale = R.anim.scale;
+        int animationTranslate = R.anim.translate;
+
+        // Seek Bar
         seekBar = findViewById(R.id.seek_bar);
         seekBar.setMax(100);
         songTimeElapsed.setText(R.string.initial_timer);
 
+        // Used for Notifications
+        listOfDrawableImageButtons = new ArrayList<>(Arrays.asList(R.drawable.previous, R.drawable.play, R.drawable.stop, R.drawable.next));
+        listOfNotificationActions = new ArrayList<>(Arrays.asList(Constants.NotificationAction.PREVIOUS_SONG_ACTION,
+                                                                  Constants.NotificationAction.PLAY_SONG_ACTION,
+                                                                  Constants.NotificationAction.STOP_SONG_ACTION,
+                                                                  Constants.NotificationAction.NEXT_SONG_ACTION));
+        listOfNotificationActionTitles = new ArrayList<>(Arrays.asList("Previous", "Play", "Stop", "Next"));
+        listOfNotificationPendingIntents = new ArrayList<>();
+        listOfNotificationActionBuilders = new ArrayList<>();
+
+        startViewAnimation(footer, animationTranslate);
         updateViewDetails(artist, title, size, length);
         setSeekBarListener();
         setPlaySongListener();
@@ -103,35 +149,102 @@ public class MusicPlayer extends AppCompatActivity {
         setShuffleSongsListener();
         setRepeatSongListener();
         showActionBarNotification();
-        startPlaying(path);
         controlAudioFocus();
-        startService();
+        startPlaying(path);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu, menu);
+        super.onCreateOptionsMenu(menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item_default_theme:
+                setSelectedThemes(lightGreenColour, redColour);
+                isDefaultThemeOn = true;
+                isDarkThemeOn = false;
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Default Theme selected!");
+                break;
+            case R.id.item_dark_theme:
+                setSelectedThemes(redColour, yellowColour);
+                isDefaultThemeOn = false;
+                isDarkThemeOn = true;
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Dark Theme selected!");
+                break;
+            case R.id.item_tags:
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Update Tags selected!");
+                break;
+            case R.id.item_favourites:
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Favourites selected!");
+                break;
+            case R.id.item_about:
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu About selected!");
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        return true;
+    }
+
+    // Set the Light or Dark Theme from the Menu Selection
+    private void setSelectedThemes(int backgroundColour, int textColour) {
+        ViewCompat.setBackgroundTintList(constraintLayout, ContextCompat.getColorStateList(this, backgroundColour));
+        setColourForTextViews(textColour);
+        setColourForSwitches(textColour);
+
+        //seekBar.getProgressDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
+        //seekBar.getThumb().setColorFilter(yellowColour, PorterDuff.Mode.SRC_ATOP);
+    }
+
+    // Control the Colours for the Text Views
+    private void setColourForTextViews(int textColour) {
+        ArrayList<TextView> listOfTextViews = new ArrayList<>(Arrays.asList(songArtist, songTitle, songSize, songLength, songTimeElapsed, footer));
+
+        for (TextView textView: listOfTextViews) {
+            textView.setTextColor(ContextCompat.getColor(this, textColour));
+        }
+    }
+
+    // Control the Colours for the Switches
+    private void setColourForSwitches(int textColour) {
+        if (isShuffleSongsSwitchOn) {
+            shuffleSongsSwitch.setTextColor(ContextCompat.getColor(this, textColour));
+            repeatSongSwitch.setTextColor(ContextCompat.getColor(this, greyColour));
+        } else if (isRepeatSongSwitchOn) {
+            repeatSongSwitch.setTextColor(ContextCompat.getColor(this, textColour));
+            shuffleSongsSwitch.setTextColor(ContextCompat.getColor(this, greyColour));
+        } else {
+            repeatSongSwitch.setTextColor(ContextCompat.getColor(this, greyColour));
+            shuffleSongsSwitch.setTextColor(ContextCompat.getColor(this, greyColour));
+        }
     }
 
     // Listener for Playing the Song Image Button
     private void setPlaySongListener() {
-        playSong.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                animateButtonClick(playSong);
+        playSong.setOnClickListener(v -> {
+            startViewAnimation(playSong, animationScale);
 
-                if (mediaPlayer.isPlaying() && mediaPlayer != null) {
-                    pausePlaying();
-                } else {
-                    // Paused status
-                    if (mediaPlayer != null) {
-                        if (songCurrentPosition > 0) {
-                            mediaPlayer.seekTo(songCurrentPosition);
-                            mediaPlayer.start();
-                            showToastMessageAndLogMessageTogether("Playing Song Resumed!");
-                            songCurrentPosition = 0;
-                            // Stopped status
-                        } else {
-                            startPlaying(path);
-                            showToastMessageAndLogMessageTogether("Playing Song!");
-                        }
-                        playSong.setImageResource(R.drawable.pause);
+            if (mediaPlayer.isPlaying() && mediaPlayer != null) {
+                pausePlaying();
+            } else {
+                // Paused status
+                if (mediaPlayer != null) {
+                    if (songCurrentPosition > 0) {
+                        mediaPlayer.seekTo(songCurrentPosition);
+                        mediaPlayer.start();
+                        showToastMessageAndLogMessageTogether("Playing Song Resumed!");
+                        songCurrentPosition = 0;
+                        // Stopped status
+                    } else {
+                        startPlaying(path);
+                        showToastMessageAndLogMessageTogether("Playing Song!");
                     }
+                    playSong.setImageResource(R.drawable.pause);
                 }
             }
         });
@@ -139,48 +252,40 @@ public class MusicPlayer extends AppCompatActivity {
 
     // Listener for Playing the Next Song Image Button
     private void setPlayNextSongListener() {
-        nextSong.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                animateButtonClick(nextSong);
-                switchToNextSong();
-            }
+        nextSong.setOnClickListener(v -> {
+            startViewAnimation(nextSong, animationScale);
+            switchToNextSong();
         });
     }
 
     // Listener for Playing the Previous Song Image Button
     private void setPlayPreviousSongListener() {
-        previousSong.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                animateButtonClick(previousSong);
-                showToastMessageAndLogMessageTogether("Playing Previous Song!");
+        previousSong.setOnClickListener(v -> {
+            startViewAnimation(previousSong, animationScale);
+            showToastMessageAndLogMessageTogether("Playing Previous Song!");
 
-                if (songIndex == 0) {
-                    songIndex = listOfSongs.size() - 1;
-                } else {
-                    songIndex = songIndex - 1;
-                }
-                updateToStartNewSong();
+            if (songIndex == 0) {
+                songIndex = listOfSongs.size() - 1;
+            } else {
+                songIndex = songIndex - 1;
             }
+            updateToStartNewSong();
         });
     }
 
     // Listener for Stopping the Song Image Button
     private void setStopPlayingSongListener() {
-        stopSong.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mediaPlayer.isPlaying() && mediaPlayer != null) {
-                    stopPlaying();
-                }
+        stopSong.setOnClickListener(v -> {
+            startViewAnimation(stopSong, animationScale);
+
+            if (mediaPlayer.isPlaying() && mediaPlayer != null) {
+                stopPlaying();
             }
         });
     }
 
     // Stop plying a Song
     public void stopPlaying() {
-        animateButtonClick(stopSong);
         showToastMessageAndLogMessageTogether("Playing Song Stopped!");
         playSong.setImageResource(R.drawable.play);
         songTimeElapsed.setText(R.string.initial_timer);
@@ -229,31 +334,24 @@ public class MusicPlayer extends AppCompatActivity {
     // Put Toast Message and Log Message together
     public void showToastMessageAndLogMessageTogether(String message) {
         displayToastMessage(message);
-        Log.i(MUSIC_TAG, message);
+        Log.i(Constants.LogTags.MUSIC_TAG, message);
     }
 
-    // Set Animation for Image Button clicks
-    private void animateButtonClick(ImageButton button) {
-        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
-        button.startAnimation(animation);
+    // Animate different Views (ImageButton on click or starting footer animation)
+    private void startViewAnimation(View view, int anim) {
+        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), anim);
+        view.startAnimation(animation);
     }
 
     // Update the song artist, title and the length of the song
     private void updateViewDetails(String artist, String title, double size, long duration) {
-        String stringSongSize = getDoubleToStringValueOfConvertedAndRoundedSongSize(size);
+        String stringSongSize = ConverterUtility.getDoubleToStringValueOfConvertedAndRoundedSongSize(size);
         String songDuration = ConverterUtility.convertMillisecondsToMinutesAndSeconds(duration);
 
         songArtist.setText(artist);
         songTitle.setText(title);
         songSize.setText(stringSongSize);
         songLength.setText(songDuration);
-    }
-
-    // Get the String value of the song size (double)
-    private String getDoubleToStringValueOfConvertedAndRoundedSongSize(double size) {
-        double convertedSongSize = ConverterUtility.convertBytesToMegabytes(size);
-        double convertedSongSizeRounded = ConverterUtility.roundDoubleValue(convertedSongSize, 2);
-        return (Double.toString(convertedSongSizeRounded)) + " MB";
     }
 
     // Updating Seek Bar progress
@@ -283,7 +381,7 @@ public class MusicPlayer extends AppCompatActivity {
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
                 musicHandler.removeCallbacks(musicUpdateProgressBar);
-                Log.i(MUSIC_TAG, "Progress Bar User Interaction!");
+                Log.i(Constants.LogTags.MUSIC_TAG, "Progress Bar User Interaction!");
             }
 
             @Override
@@ -302,7 +400,7 @@ public class MusicPlayer extends AppCompatActivity {
         showToastMessageAndLogMessageTogether("Playing Next Song!");
 
         if (isRepeatSongSwitchOn) {
-            Log.i(MUSIC_TAG, "Song at index " + songIndex + " is repeated!");
+            Log.i(Constants.LogTags.MUSIC_TAG, "Song at index " + songIndex + " is repeated!");
         } else if (isShuffleSongsSwitchOn) {
             songIndex = ConverterUtility.generateRandomSongIndex(listOfSongs.size());
         } else {
@@ -321,96 +419,126 @@ public class MusicPlayer extends AppCompatActivity {
         updateViewDetails(artistNewSong, titleNewSong, sizeNewSong, durationNewSong);
         startPlaying(path);
         showActionBarNotification();
-        Log.i(MUSIC_TAG, "Artist: " + artistNewSong + ". New Song Index: " + songIndex);
+        Log.i(Constants.LogTags.MUSIC_TAG, "Artist: " + artistNewSong + ". New Song Index: " + songIndex);
     }
 
     // Set the On Completion Media Player Listener
     private void setMediaPlayerListener() {
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                switchToNextSong();
-            }
-        });
+        mediaPlayer.setOnCompletionListener(mp -> switchToNextSong());
     }
 
     // Listener for the Switch used for shuffling all Songs
     private void setShuffleSongsListener() {
-        shuffleSongsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                isShuffleSongsSwitchOn = isChecked;
-                handleShuffleAndRepeatSongsListeners(isChecked,"Shuffle ON", "Shuffle OFF", shuffleSongsSwitch, repeatSongSwitch);
-            }
+        shuffleSongsSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            isShuffleSongsSwitchOn = isChecked;
+            handleShuffleAndRepeatSongsListeners(isChecked,"Shuffle ON", "Shuffle OFF", shuffleSongsSwitch, repeatSongSwitch);
         });
     }
 
     // Listener for the Switch used for repeating a single Song
     private void setRepeatSongListener() {
-        repeatSongSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                isRepeatSongSwitchOn = isChecked;
-                handleShuffleAndRepeatSongsListeners(isChecked, "Repeat ON", "Repeat OFF", repeatSongSwitch, shuffleSongsSwitch);
-            }
+        repeatSongSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            isRepeatSongSwitchOn = isChecked;
+            handleShuffleAndRepeatSongsListeners(isChecked, "Repeat ON", "Repeat OFF", repeatSongSwitch, shuffleSongsSwitch);
         });
     }
 
     // Handles common functionality for Shuffle and Repeat Song Listeners
     private void handleShuffleAndRepeatSongsListeners(boolean isChecked, String messageOn, String messageOff, Switch switchOne, Switch switchTwo) {
+        int textColour = ContextCompat.getColor(this, redColour);
+
+        if (isDefaultThemeOn) {
+            textColour = ContextCompat.getColor(this, redColour);
+        } else if (isDarkThemeOn) {
+            textColour = ContextCompat.getColor(this, yellowColour);
+        }
+
         if (isChecked) {
             showToastMessageAndLogMessageTogether(messageOn);
-            switchOne.setTextColor(Color.rgb(255, 0, 0));
+            switchOne.setTextColor(textColour);
             switchTwo.setChecked(false);
         } else {
             showToastMessageAndLogMessageTogether(messageOff);
-            switchOne.setTextColor(Color.rgb(168, 168, 168));
+            switchOne.setTextColor(ContextCompat.getColor(this, greyColour));
         }
-        Log.i(MUSIC_TAG, "Shuffle Switch: " + isShuffleSongsSwitchOn + ". Repeat Switch: " + isRepeatSongSwitchOn);
+        Log.i(Constants.LogTags.MUSIC_TAG, "Shuffle Switch: " + isShuffleSongsSwitchOn + ". Repeat Switch: " + isRepeatSongSwitchOn);
     }
 
     // Create an Action Bar Notification
     public void showActionBarNotification() {
-        String songArtist = listOfSongs.get(songIndex).getArtist();
         String songTitle = listOfSongs.get(songIndex).getTitle();
+        String songArtist = listOfSongs.get(songIndex).getArtist();
 
-        Intent notificationIntent = new Intent(this, MusicPlayer.class);
-        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        //NotificationChannel notificationChannel = new NotificationChannel(ACTION_BAR_CHANNEL_ID, "Channel 100", NotificationManager.IMPORTANCE_DEFAULT);
-        //notificationChannel.setSound(null, null);
-        notificationManager = NotificationManagerCompat.from(this);
-        //assert notificationManager != null;
-        //notificationManager.createNotificationChannel(notificationChannel);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, ACTION_BAR_CHANNEL_ID);
-
-        //RemoteViews notificationCompact = new RemoteViews(getPackageName(), R.layout.notification_compact);
-        //RemoteViews notificationExpanded = new RemoteViews(getPackageName(), R.layout.music_player);
-
-        notificationBuilder
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setContentTitle(songTitle)
-            .setContentText(songArtist)
-            .setContentIntent(pendingIntent)
-            //.setCustomContentView(notificationCompact)
-            //.setCustomBigContentView(notificationExpanded)
-            .setSmallIcon(R.drawable.icon_notification)
-            .setLargeIcon(decodeResource(getResources(), R.drawable.icon_notification))
-                .setStyle(new NotificationCompat.BigPictureStyle()
-                        .bigPicture(decodeResource(getResources(), R.drawable.icon_notification))
-                        .bigLargeIcon(null))
-            .setTicker(songTitle)
-            .setOnlyAlertOnce(true)
-            .setOngoing(true);
-        Notification notification = notificationBuilder.build();
-        notificationManager.notify(ACTION_BAR_NOTIFICATION_ID, notification);
+        PendingIntent pendingIntent = createNotificationPendingIntent();
+        setUpNotificationChannel();
+        createNotificationActionPendingIntents();
+        createNotificationActionBuilders();
+        createNotificationCompatBuilder(pendingIntent, songTitle, songArtist);
     }
 
-    public void startService() {
-        Intent serviceIntent = new Intent(MusicPlayer.this, NotificationService.class);
-        serviceIntent.setAction(Constants.ACTION.START_FOREGROUND_ACTION);
-        startService(serviceIntent);
+    // Create the Notification Pending Intent to start the Notification
+    private PendingIntent createNotificationPendingIntent() {
+        Intent notificationIntent = new Intent(this, MusicPlayer.class);
+        notificationIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        return PendingIntent.getService(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    // Prepare the Notification Channel
+    private void setUpNotificationChannel() {
+        NotificationChannel notificationChannel = new NotificationChannel(Constants.NotificationIdentifier.NOTIFICATION_CHANNEL_ID, "Channel 100", NotificationManager.IMPORTANCE_HIGH);
+        notificationChannel.setSound(null, null);
+        notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        assert notificationManager != null;
+        notificationManager.createNotificationChannel(notificationChannel);
+    }
+
+    // Create the Notification Pending Intents to control Notification Actions
+    private void createNotificationActionPendingIntents() {
+        int requestCodeCounter = 0;
+
+        for (String action: listOfNotificationActions) {
+            requestCodeCounter++;
+            Intent intent = new Intent(this, MusicReceiver.class);
+            intent.setAction(action);
+            intent.putExtra(Constants.NotificationAction.NOTIFICATION_ACTION_KEY, action);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCodeCounter, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            listOfNotificationPendingIntents.add(pendingIntent);
+        }
+    }
+
+    // Create the Notification Action Builders
+    private void createNotificationActionBuilders() {
+        int actionCounter = 0;
+
+        for (String title: listOfNotificationActionTitles) {
+            NotificationCompat.Action action = new NotificationCompat.Action.Builder(listOfDrawableImageButtons.get(actionCounter), title, listOfNotificationPendingIntents.get(actionCounter)).build();
+            listOfNotificationActionBuilders.add(action);
+            actionCounter++;
+        }
+    }
+
+    // Create the Main Notification Builder to send Notification/notify()
+    private void createNotificationCompatBuilder(PendingIntent pendingIntent, String songTitle, String songArtist) {
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, Constants.NotificationIdentifier.NOTIFICATION_CHANNEL_ID);
+        notificationBuilder
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setColor(ContextCompat.getColor(this, R.color.red))
+                .setContentTitle(songTitle)
+                .setContentText(songArtist)
+                .setContentIntent(pendingIntent)
+                .setSmallIcon(R.drawable.icon_notification)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.music))
+                .setStyle(new NotificationCompat.BigPictureStyle().bigPicture(BitmapFactory.decodeResource(getResources(), R.drawable.guitar)))
+                .addAction(listOfNotificationActionBuilders.get(0))
+                //.addAction(listOfNotificationActionBuilders.get(1))
+                .addAction(listOfNotificationActionBuilders.get(2))
+                .addAction(listOfNotificationActionBuilders.get(3))
+                .setTicker(songTitle)
+                .setOnlyAlertOnce(true)
+                .setOngoing(true);
+        //.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
+        Notification notification = notificationBuilder.build();
+        notificationManager.notify(Constants.NotificationIdentifier.NOTIFICATION_ID, notification);
     }
 
     // Handles Audio Focus states
@@ -423,28 +551,24 @@ public class MusicPlayer extends AppCompatActivity {
                 .build();
 
         audioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                .setFocusGain(AudioManager.AUDIOFOCUS_GAIN)
                 .setAudioAttributes(audioAttributes)
                 .setAcceptsDelayedFocusGain(true)
                 .setWillPauseWhenDucked(true)
-                .setOnAudioFocusChangeListener(new AudioManager.OnAudioFocusChangeListener() {
-                    @Override
-                    public void onAudioFocusChange(int focusChange) {
-                        if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
-                            audioManager.abandonAudioFocusRequest(audioFocusRequest);
-                            stopPlaying();
-                            Log.i(MusicPlayer.MUSIC_TAG, "Focus Change: Audio Focus Loss.");
-                        } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-                            pausePlaying();
-                            Log.i(MusicPlayer.MUSIC_TAG, "Focus Change: Audio Focus Loss Transient.");
-                        } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-                            mediaPlayer.setVolume(0.2f, 0.2f);
-                            // !!!!!!!!!!!! NEEDS to FIX because song starts playing from the beginning !!!!!!!!!!!!!!!!!!!!
-                            Log.i(MusicPlayer.MUSIC_TAG, "Focus Change: Audio Focus Loss Transient Can Duck.");
-                        } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-                            mediaPlayer.setVolume(0.7f, 0.7f);
-                            startPlaying(path);
-                            Log.i(MusicPlayer.MUSIC_TAG, "Focus Change: Audio Focus Gain.");
-                        }
+                .setOnAudioFocusChangeListener(focusChange -> {
+                    if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+                        Log.i(Constants.LogTags.MUSIC_TAG, "Focus Change: Audio Focus Loss.");
+                        stopPlaying();
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+                        Log.i(Constants.LogTags.MUSIC_TAG, "Focus Change: Audio Focus Loss Transient.");
+                        pausePlaying();
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+                        Log.i(Constants.LogTags.MUSIC_TAG, "Focus Change: Audio Focus Loss Transient Can Duck.");
+                        pausePlaying();
+                    } else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+                        Log.i(Constants.LogTags.MUSIC_TAG, "Focus Change: Audio Focus Gain.");
+                        mediaPlayer.seekTo(songCurrentPosition);
+                        mediaPlayer.start();
                     }
                 })
                 .build();
@@ -457,14 +581,28 @@ public class MusicPlayer extends AppCompatActivity {
     public void onBackPressed() {
         super.onBackPressed();
         musicHandler.removeCallbacksAndMessages(null);
-        Log.i(MUSIC_TAG, "On Back Pressed!");
+        Log.i(Constants.LogTags.MUSIC_TAG, "On Back Pressed!");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        destroyMusicPlayerActivity();
+        audioManager.abandonAudioFocusRequest(audioFocusRequest);
+        notificationManager.cancel(Constants.NotificationIdentifier.NOTIFICATION_ID);
+    }
+
+    // Destroy Music Player Activity
+    private void destroyMusicPlayerActivity() {
         mediaPlayer.release();
         mediaPlayer = null;
-        Log.i(MUSIC_TAG, "Music Player Activity Destroyed!");
+        Log.i(Constants.LogTags.MUSIC_TAG, "Music Player Activity Destroyed!");
     }
 }
+
+// TODO Maybe it needs to be implemented later in showActionBarNotification method
+//RemoteViews notificationCompact = new RemoteViews(getPackageName(), R.layout.notification_compact);
+//RemoteViews notificationExpanded = new RemoteViews(getPackageName(), R.layout.notification_expanded);
+//notificationCompact.setOnClickPendingIntent(R.id.button_previous, pendingPreviousIntent);
+//.setCustomContentView(notificationCompact)
+//.setCustomBigContentView(notificationExpanded)

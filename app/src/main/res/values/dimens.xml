@@ -16,5 +16,6 @@
     <dimen name="margin_eight">8dp</dimen>
     <dimen name="margin_five">5dp</dimen>
     <dimen name="margin_two">2dp</dimen>
+    <dimen name="menu_items_divider">1dp</dimen>
     <dimen name="size_one">1px</dimen>
 </resources>
