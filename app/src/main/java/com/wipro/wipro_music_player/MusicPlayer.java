@@ -70,10 +70,8 @@ public class MusicPlayer extends AppCompatActivity {
     private static ArrayList<Integer> listOfDrawableImageButtons;
     private static ArrayList<PendingIntent> listOfNotificationPendingIntents;
     private static ArrayList<NotificationCompat.Action> listOfNotificationActionBuilders;
-    // Action Bar Menu Items
-    private MenuItem itemDefaultTheme, itemDarkTheme, itemTags, itemFavourites, itemAbout;
     private boolean isDefaultThemeOn, isDarkThemeOn;
-    private int greyColour, redColour, yellowColour, lightGreenColour, blackColour;
+    private int greyColour, redColour, yellowColour, lightGreenColour;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,11 +105,11 @@ public class MusicPlayer extends AppCompatActivity {
         repeatSongSwitch = findViewById(R.id.switch_repeat);
         constraintLayout = findViewById(R.id.music_player_main_layout);
         // Action Bar Menu Items
-        itemDefaultTheme = findViewById(R.id.item_default_theme);
-        itemDarkTheme = findViewById(R.id.item_dark_theme);
-        itemTags = findViewById(R.id.item_tags);
-        itemFavourites = findViewById(R.id.item_favourites);
-        itemAbout = findViewById(R.id.item_about);
+        MenuItem itemDefaultTheme = findViewById(R.id.item_default_theme);
+        MenuItem itemDarkTheme = findViewById(R.id.item_dark_theme);
+        MenuItem itemTags = findViewById(R.id.item_tags);
+        MenuItem itemFavourites = findViewById(R.id.item_favourites);
+        MenuItem itemAbout = findViewById(R.id.item_about);
         isDefaultThemeOn = true;
         isDarkThemeOn = false;
 
@@ -120,7 +118,7 @@ public class MusicPlayer extends AppCompatActivity {
         redColour = R.color.red;
         yellowColour = R.color.yellow;
         lightGreenColour = R.color.light_green;
-        blackColour = R.color.black;
+
         // Assign Animations
         animationScale = R.anim.scale;
         int animationTranslate = R.anim.translate;
@@ -173,7 +171,7 @@ public class MusicPlayer extends AppCompatActivity {
                 Log.i(Constants.LogTags.MUSIC_TAG, "Menu Default Theme selected!");
                 break;
             case R.id.item_dark_theme:
-                setSelectedThemes(blackColour, yellowColour);
+                setSelectedThemes(redColour, yellowColour);
                 isDefaultThemeOn = false;
                 isDarkThemeOn = true;
                 Log.i(Constants.LogTags.MUSIC_TAG, "Menu Dark Theme selected!");
