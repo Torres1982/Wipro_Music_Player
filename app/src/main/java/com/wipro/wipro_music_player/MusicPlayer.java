@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
@@ -52,6 +53,7 @@ public class MusicPlayer extends AppCompatActivity {
     private String path;
     private int songIndex;
     private int songCurrentPosition;
+    private int animationScale;
     private List<SongModel> listOfSongs = new ArrayList<>();
     private String artistNewSong;
     private String titleNewSong;
@@ -119,6 +121,9 @@ public class MusicPlayer extends AppCompatActivity {
         yellowColour = R.color.yellow;
         lightGreenColour = R.color.light_green;
         blackColour = R.color.black;
+        // Assign Animations
+        animationScale = R.anim.scale;
+        int animationTranslate = R.anim.translate;
 
         // Seek Bar
         seekBar = findViewById(R.id.seek_bar);
@@ -135,9 +140,7 @@ public class MusicPlayer extends AppCompatActivity {
         listOfNotificationPendingIntents = new ArrayList<>();
         listOfNotificationActionBuilders = new ArrayList<>();
 
-        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.translate);
-        footer.startAnimation(animation);
-
+        startViewAnimation(footer, animationTranslate);
         updateViewDetails(artist, title, size, length);
         setSeekBarListener();
         setPlaySongListener();
@@ -226,7 +229,7 @@ public class MusicPlayer extends AppCompatActivity {
     // Listener for Playing the Song Image Button
     private void setPlaySongListener() {
         playSong.setOnClickListener(v -> {
-            animateButtonClick(playSong);
+            startViewAnimation(playSong, animationScale);
 
             if (mediaPlayer.isPlaying() && mediaPlayer != null) {
                 pausePlaying();
@@ -252,7 +255,7 @@ public class MusicPlayer extends AppCompatActivity {
     // Listener for Playing the Next Song Image Button
     private void setPlayNextSongListener() {
         nextSong.setOnClickListener(v -> {
-            animateButtonClick(nextSong);
+            startViewAnimation(nextSong, animationScale);
             switchToNextSong();
         });
     }
@@ -260,7 +263,7 @@ public class MusicPlayer extends AppCompatActivity {
     // Listener for Playing the Previous Song Image Button
     private void setPlayPreviousSongListener() {
         previousSong.setOnClickListener(v -> {
-            animateButtonClick(previousSong);
+            startViewAnimation(previousSong, animationScale);
             showToastMessageAndLogMessageTogether("Playing Previous Song!");
 
             if (songIndex == 0) {
@@ -275,7 +278,7 @@ public class MusicPlayer extends AppCompatActivity {
     // Listener for Stopping the Song Image Button
     private void setStopPlayingSongListener() {
         stopSong.setOnClickListener(v -> {
-            animateButtonClick(stopSong);
+            startViewAnimation(stopSong, animationScale);
 
             if (mediaPlayer.isPlaying() && mediaPlayer != null) {
                 stopPlaying();
@@ -336,10 +339,10 @@ public class MusicPlayer extends AppCompatActivity {
         Log.i(Constants.LogTags.MUSIC_TAG, message);
     }
 
-    // Set Animation for Image Button clicks
-    private void animateButtonClick(ImageButton button) {
-        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.scale);
-        button.startAnimation(animation);
+    // Animate different Views (ImageButton on click or starting footer animation)
+    private void startViewAnimation(View view, int anim) {
+        Animation animation = AnimationUtils.loadAnimation(getApplicationContext(), anim);
+        view.startAnimation(animation);
     }
 
     // Update the song artist, title and the length of the song
