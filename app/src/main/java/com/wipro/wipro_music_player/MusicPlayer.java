@@ -7,20 +7,15 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.media.AudioAttributes;
 import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.ColorInt;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.MenuCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -37,11 +32,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wipro.wipro_music_player.util.ConverterUtility;
+import com.wipro.wipro_music_player.SongModel;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import io.realm.Realm;
 
 public class MusicPlayer extends AppCompatActivity {
     private TextView songTitle, songArtist, songSize, songLength, songTimeElapsed, footer;
@@ -77,6 +75,9 @@ public class MusicPlayer extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.music_player);
+
+        // Initialize the Realm DB
+        Realm.init(this);
 
         Intent musicIntent = getIntent();
         Bundle extras = musicIntent.getExtras();

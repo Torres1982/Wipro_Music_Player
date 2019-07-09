@@ -22,4 +22,16 @@ public class Constants {
         int NOTIFICATION_ID = 100;
         String NOTIFICATION_CHANNEL_ID = "com.wipro.torres.music_player";
     }
+
+    // Holds the User Settings for Realm DB
+    public interface UserRealmDbSettings {
+        int DEFAULT_THEME_STATUS_OFF = 0;
+        int DEFAULT_THEME_STATUS_ON = 1;
+        int DARK_THEME_STATUS_OFF = 0;
+        int DARK_THEME_STATUS_ON = 1;
+        int SHUFFLE_SWITCH_STATUS_OFF = 0;
+        int SHUFFLE_SWITCH_STATUS_ON = 1;
+        int REPEAT_SWITCH_STATUS_OFF = 0;
+        int REPEAT_SWITCH_STATUS_ON = 1;
+    }
 }
