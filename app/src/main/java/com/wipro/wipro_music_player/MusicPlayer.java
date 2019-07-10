@@ -197,9 +197,6 @@ public class MusicPlayer extends AppCompatActivity {
         ViewCompat.setBackgroundTintList(constraintLayout, ContextCompat.getColorStateList(this, backgroundColour));
         setColourForTextViews(textColour);
         setColourForSwitches(textColour);
-
-        //seekBar.getProgressDrawable().setColorFilter(Color.GREEN, PorterDuff.Mode.SRC_ATOP);
-        //seekBar.getThumb().setColorFilter(yellowColour, PorterDuff.Mode.SRC_ATOP);
     }
 
     // Control the Colours for the Text Views

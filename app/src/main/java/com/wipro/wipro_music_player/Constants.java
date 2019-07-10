@@ -33,5 +33,7 @@ public class Constants {
         int SHUFFLE_SWITCH_STATUS_ON = 1;
         int REPEAT_SWITCH_STATUS_OFF = 0;
         int REPEAT_SWITCH_STATUS_ON = 1;
+        int FAVOURITE_SONG_STATUS_OFF = 0;
+        int FAVOURITE_SONG_STATUS_ON = 1;
     }
 }
