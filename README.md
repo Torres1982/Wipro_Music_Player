@@ -5,6 +5,7 @@
 1. Android Studio
 2. Java
 3. XML
+4. Realm DB
 
 ### Assessment Description:
 
@@ -15,3 +16,11 @@ application.
 3. Application should allow the songs being played and controlled using the buttons [for example, next button: should allow 
 the next song in the list to be played].
 4. Optionally, the app can also contain a text view which may display the song which is currently being played.
+
+### Extra Features:
+1. Music App implements the *Switches* for repeating the song and shuffling the songs.
+2. Implementation of *Animations* (translate and rotate) enhance the visual effects of the Player.
+3. Local database - *Realm* (alternative to SQLlite) stores the user settings (Theme/Skin and states of the switches).
+4. *Audio Focus* applied to manage different Media sounds.
+5. *Notification* applied (showing a little icon in the Action Bar). NEEDS TO BE FIXED!
+6. *Menu Items* added to the Action Bar (Settings, Favourites, About, Themes, etc.).
