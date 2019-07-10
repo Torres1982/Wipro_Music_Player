@@ -31,6 +31,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.wipro.wipro_music_player.controller.RealmController;
 import com.wipro.wipro_music_player.util.ConverterUtility;
 import com.wipro.wipro_music_player.SongModel;
 
@@ -38,8 +39,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import io.realm.Realm;
 
 public class MusicPlayer extends AppCompatActivity {
     private TextView songTitle, songArtist, songSize, songLength, songTimeElapsed, footer;
@@ -75,9 +74,6 @@ public class MusicPlayer extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.music_player);
-
-        // Initialize the Realm DB
-        Realm.init(this);
 
         Intent musicIntent = getIntent();
         Bundle extras = musicIntent.getExtras();
@@ -583,6 +579,12 @@ public class MusicPlayer extends AppCompatActivity {
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        updateUserSettings();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         destroyMusicPlayerActivity();
@@ -595,6 +597,35 @@ public class MusicPlayer extends AppCompatActivity {
         mediaPlayer.release();
         mediaPlayer = null;
         Log.i(Constants.LogTags.MUSIC_TAG, "Music Player Activity Destroyed!");
+    }
+
+    // Handles updates for User Settings
+    private void updateUserSettings() {
+        int defaultThemeStatus, darkThemeStatus, shuffleSwitchStatus, repeatSwitchStatus;
+
+        // Manage Themes
+        if (isDefaultThemeOn) {
+            defaultThemeStatus = Constants.UserSettings.DEFAULT_THEME_STATUS_ON;
+            darkThemeStatus = Constants.UserSettings.DARK_THEME_STATUS_OFF;
+        } else {
+            defaultThemeStatus = Constants.UserSettings.DEFAULT_THEME_STATUS_OFF;
+            darkThemeStatus = Constants.UserSettings.DARK_THEME_STATUS_ON;
+        }
+
+        // Manage Switches
+        if (isShuffleSongsSwitchOn) {
+            shuffleSwitchStatus = Constants.UserSettings.SHUFFLE_SWITCH_STATUS_ON;
+        } else {
+            shuffleSwitchStatus = Constants.UserSettings.SHUFFLE_SWITCH_STATUS_OFF;
+        }
+
+        if (isRepeatSongSwitchOn) {
+            repeatSwitchStatus = Constants.UserSettings.REPEAT_SWITCH_STATUS_ON;
+        } else {
+            repeatSwitchStatus = Constants.UserSettings.REPEAT_SWITCH_STATUS_OFF;
+        }
+
+        RealmController.saveUserSettings(defaultThemeStatus, darkThemeStatus, shuffleSwitchStatus, repeatSwitchStatus);
     }
 }
 

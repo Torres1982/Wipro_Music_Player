@@ -20,6 +20,8 @@ import com.wipro.wipro_music_player.SongModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+
 public class MusicListActivity extends AppCompatActivity {
     static List<SongModel> musicList;
 
@@ -27,6 +29,9 @@ public class MusicListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.songs_list);
+
+        // Initialize the Realm DB
+        Realm.init(this);
 
         PermissionUtility.checkStoragePermissions(getApplicationContext(), this);
         musicList = getAllAudioFromDevice(this);
