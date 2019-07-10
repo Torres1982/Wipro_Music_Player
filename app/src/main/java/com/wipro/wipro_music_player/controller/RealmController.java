@@ -9,29 +9,30 @@ import io.realm.RealmConfiguration;
 
 public class RealmController {
     // Set up the Default Realm Configuration for the Application
-    private static RealmConfiguration createDefaultRealmConfiguration() {
-        // Generate the random Encryption Key
-        byte [] encryptionKey = new byte [64];
-        new SecureRandom().nextBytes(encryptionKey);
-
-        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
-                .name(Constants.RealmDB.DEFAULT_REALM_CONFIGURATION_NAME)
-                .encryptionKey(encryptionKey)
-                .schemaVersion(0)
-                .deleteRealmIfMigrationNeeded()
-                .build();
-        Realm.setDefaultConfiguration(realmConfiguration);
-        return realmConfiguration;
-    }
+//    private static RealmConfiguration createDefaultRealmConfiguration() {
+//        // Generate the random Encryption Key
+//        byte [] encryptionKey = new byte [64];
+//        new SecureRandom().nextBytes(encryptionKey);
+//
+//        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
+//                .name(Constants.RealmDB.DEFAULT_REALM_CONFIGURATION_NAME)
+//                .encryptionKey(encryptionKey)
+//                .schemaVersion(0)
+//                .deleteRealmIfMigrationNeeded()
+//                .build();
+//        Realm.setDefaultConfiguration(realmConfiguration);
+//        return realmConfiguration;
+//    }
 
     // Get the instance of Realm
-    private static Realm getRealmInstance() {
-        return Realm.getInstance(createDefaultRealmConfiguration());
-    }
+//    private static Realm getRealmInstance() {
+//        return Realm.getInstance(createDefaultRealmConfiguration());
+//    }
 
     // Save the User Settings
     public static void saveUserSettings(int defaultThemeStatus, int darkThemeStatus, int shuffleSwitchStatus, int repeatSwitchStatus) {
-        Realm realm = getRealmInstance();
+        //Realm realm = getRealmInstance();
+        Realm realm = Realm.getDefaultInstance();
         UserSettingsModel userSettingsModel = new UserSettingsModel();
 
         realm.executeTransactionAsync(realmExecute -> {
@@ -44,6 +45,7 @@ public class RealmController {
         }, () -> Log.i(Constants.LogTags.MUSIC_TAG, "User settings successfully saved to Realm DB!"),
         error -> Log.i(Constants.LogTags.MUSIC_TAG, "User settings could not be saved to Realm DB!"));
 
+        realm.close();
 
 //        UserSettingsModel userSettingsReal = new UserSettingsModel();
 //        userSettingsReal.setId(1);

@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import io.realm.Realm;
+
 public class MusicPlayer extends AppCompatActivity {
     private TextView songTitle, songArtist, songSize, songLength, songTimeElapsed, footer;
     private ImageButton playSong, stopSong, nextSong, previousSong;
@@ -134,6 +136,9 @@ public class MusicPlayer extends AppCompatActivity {
         listOfNotificationActionTitles = new ArrayList<>(Arrays.asList("Previous", "Play", "Stop", "Next"));
         listOfNotificationPendingIntents = new ArrayList<>();
         listOfNotificationActionBuilders = new ArrayList<>();
+
+        // Initialize the Realm DB
+        Realm.init(this);
 
         startViewAnimation(footer, animationTranslate);
         updateViewDetails(artist, title, size, length);
