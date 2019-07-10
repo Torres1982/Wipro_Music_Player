@@ -32,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.wipro.wipro_music_player.controller.RealmController;
+import com.wipro.wipro_music_player.model.UserSettingsModel;
 import com.wipro.wipro_music_player.util.ConverterUtility;
 import com.wipro.wipro_music_player.SongModel;
 
@@ -71,6 +72,7 @@ public class MusicPlayer extends AppCompatActivity {
     private static ArrayList<NotificationCompat.Action> listOfNotificationActionBuilders;
     private boolean isDefaultThemeOn, isDarkThemeOn;
     private int greyColour, redColour, yellowColour, lightGreenColour;
+    private Realm realm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,8 +139,9 @@ public class MusicPlayer extends AppCompatActivity {
         listOfNotificationPendingIntents = new ArrayList<>();
         listOfNotificationActionBuilders = new ArrayList<>();
 
-        // Initialize the Realm DB
-        Realm.init(this);
+        // Realm DB
+        realm = Realm.getDefaultInstance();
+        //addUserSettings(realm);
 
         startViewAnimation(footer, animationTranslate);
         updateViewDetails(artist, title, size, length);
@@ -584,23 +587,19 @@ public class MusicPlayer extends AppCompatActivity {
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
+    public void onPause() {
+        super.onPause();
         updateUserSettings();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        destroyMusicPlayerActivity();
-        audioManager.abandonAudioFocusRequest(audioFocusRequest);
-        notificationManager.cancel(Constants.NotificationIdentifier.NOTIFICATION_ID);
-    }
-
-    // Destroy Music Player Activity
-    private void destroyMusicPlayerActivity() {
         mediaPlayer.release();
         mediaPlayer = null;
+        audioManager.abandonAudioFocusRequest(audioFocusRequest);
+        notificationManager.cancel(Constants.NotificationIdentifier.NOTIFICATION_ID);
+        realm.close();
         Log.i(Constants.LogTags.MUSIC_TAG, "Music Player Activity Destroyed!");
     }
 
@@ -630,7 +629,7 @@ public class MusicPlayer extends AppCompatActivity {
             repeatSwitchStatus = Constants.UserSettings.REPEAT_SWITCH_STATUS_OFF;
         }
 
-        RealmController.saveUserSettings(defaultThemeStatus, darkThemeStatus, shuffleSwitchStatus, repeatSwitchStatus);
+        RealmController.saveUserSettings(realm, defaultThemeStatus, darkThemeStatus, shuffleSwitchStatus, repeatSwitchStatus);
     }
 }
 
