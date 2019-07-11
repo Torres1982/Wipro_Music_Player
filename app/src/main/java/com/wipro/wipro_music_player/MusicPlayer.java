@@ -108,11 +108,11 @@ public class MusicPlayer extends AppCompatActivity {
         repeatSongSwitch = findViewById(R.id.switch_repeat);
         constraintLayout = findViewById(R.id.music_player_main_layout);
         // Action Bar Menu Items
-        MenuItem itemDefaultTheme = findViewById(R.id.item_default_theme);
-        MenuItem itemDarkTheme = findViewById(R.id.item_dark_theme);
-        MenuItem itemTags = findViewById(R.id.item_tags);
-        MenuItem itemFavourites = findViewById(R.id.item_favourites);
-        MenuItem itemAbout = findViewById(R.id.item_about);
+//        MenuItem itemDefaultTheme = findViewById(R.id.item_default_theme);
+//        MenuItem itemDarkTheme = findViewById(R.id.item_dark_theme);
+//        MenuItem itemTags = findViewById(R.id.item_tags);
+//        MenuItem itemFavourites = findViewById(R.id.item_favourites);
+//        MenuItem itemAbout = findViewById(R.id.item_about);
         isDefaultThemeOn = true;
         isDarkThemeOn = false;
 
@@ -177,10 +177,8 @@ public class MusicPlayer extends AppCompatActivity {
     private void setUpSwitchesWithSettingsFromRealmDb() {
         int shuffleSwitchFromDb = userSettingsFromRealmDb.getShuffleSwitchStatus();
         int repeatSwitchFromDb = userSettingsFromRealmDb.getRepeatSwitchStatus();
-
         isShuffleSongsSwitchOn = shuffleSwitchFromDb == Constants.UserSettings.SHUFFLE_SWITCH_STATUS_ON;
         isRepeatSongSwitchOn = repeatSwitchFromDb == Constants.UserSettings.REPEAT_SWITCH_STATUS_ON;
-
         activateSwitches();
     }
 

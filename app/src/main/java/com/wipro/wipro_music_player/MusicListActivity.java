@@ -12,6 +12,9 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 import com.wipro.wipro_music_player.util.SortUtility;
 import com.wipro.wipro_music_player.util.PermissionUtility;
@@ -29,15 +32,19 @@ public class MusicListActivity extends AppCompatActivity {
 
         PermissionUtility.checkStoragePermissions(getApplicationContext(), this);
         musicList = getAllAudioFromDevice(this);
-        SortUtility.sortMusicListAscendingByArtist(musicList);
+        setUpRecyclerViewAndAdapter();
+    }
+
+    // Prepare Recycler View and Adapter
+    private void setUpRecyclerViewAndAdapter() {
         List<SongModel> music = new ArrayList<>();
 
         for (int i = 0; i < musicList.size(); i++) {
             music.add(new SongModel(musicList.get(i).getArtist(),
-                                    musicList.get(i).getTitle(),
-                                    musicList.get(i).getPath(),
-                                    musicList.get(i).getLength(),
-                                    musicList.get(i).getSize()));
+                    musicList.get(i).getTitle(),
+                    musicList.get(i).getPath(),
+                    musicList.get(i).getLength(),
+                    musicList.get(i).getSize()));
         }
 
         MusicAdapter musicAdapter = new MusicAdapter(music);
@@ -88,7 +95,7 @@ public class MusicListActivity extends AppCompatActivity {
                 songModel.setSize(size);
                 listOfSongs.add(songModel);
 
-                Log.i(Constants.LogTags.MUSIC_TAG, "ARTIST: " + artist + ". TITLE: " + title + ". LENGTH: " + duration + ". SIZE: " + size + ". PATH: " + path);
+                //Log.i(Constants.LogTags.MUSIC_TAG, "ARTIST: " + artist + ". TITLE: " + title + ". LENGTH: " + duration + ". SIZE: " + size + ". PATH: " + path);
             }
             cursor.close();
         } else {
@@ -97,6 +104,34 @@ public class MusicListActivity extends AppCompatActivity {
             Log.i(Constants.LogTags.MUSIC_TAG, message);
         }
         return listOfSongs;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_songs_list, menu);
+        super.onCreateOptionsMenu(menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.item_sort_by_artist:
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Item - Sort by Artist selected!");
+                musicList = getAllAudioFromDevice(this);
+                SortUtility.sortMusicListAscendingByArtist(musicList);
+                break;
+            case R.id.item_sort_by_title:
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Item - Sort by Title selected!");
+                musicList = getAllAudioFromDevice(this);
+                SortUtility.sortMusicListAscendingBySongTitle(musicList);
+                break;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+        setUpRecyclerViewAndAdapter();
+        return true;
     }
 
     @Override
