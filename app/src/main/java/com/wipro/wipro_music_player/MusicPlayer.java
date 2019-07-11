@@ -72,7 +72,9 @@ public class MusicPlayer extends AppCompatActivity {
     private static ArrayList<NotificationCompat.Action> listOfNotificationActionBuilders;
     private boolean isDefaultThemeOn, isDarkThemeOn;
     private int greyColour, redColour, yellowColour, lightGreenColour;
+    // Realm DB
     private Realm realm;
+    private UserSettingsModel userSettingsFromRealmDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,8 +143,10 @@ public class MusicPlayer extends AppCompatActivity {
 
         // Realm DB
         realm = Realm.getDefaultInstance();
-        //addUserSettings(realm);
+        userSettingsFromRealmDb = RealmController.getUserSettingsFromDb(realm);
 
+        setUpThemesWithSettingsFromRealmDb();
+        setUpSwitchesWithSettingsFromRealmDb();
         startViewAnimation(footer, animationTranslate);
         updateViewDetails(artist, title, size, length);
         setSeekBarListener();
@@ -158,6 +162,43 @@ public class MusicPlayer extends AppCompatActivity {
         startPlaying(path);
     }
 
+    // Initial Set Up of Theme according to the settings gathered from Realm DB
+    private void setUpThemesWithSettingsFromRealmDb() {
+        int defaultThemeFromDb = userSettingsFromRealmDb.getDefaultThemeStatus();
+
+        if (defaultThemeFromDb == Constants.UserSettings.DEFAULT_THEME_STATUS_ON) {
+            updateDefaultThemeMenuItemOption();
+        } else {
+            updateDarkThemeMenuItemOption();
+        }
+    }
+
+    // Initial Set Up of Switches according to the settings gathered from Realm DB
+    private void setUpSwitchesWithSettingsFromRealmDb() {
+        int shuffleSwitchFromDb = userSettingsFromRealmDb.getShuffleSwitchStatus();
+        int repeatSwitchFromDb = userSettingsFromRealmDb.getRepeatSwitchStatus();
+
+        isShuffleSongsSwitchOn = shuffleSwitchFromDb == Constants.UserSettings.SHUFFLE_SWITCH_STATUS_ON;
+        isRepeatSongSwitchOn = repeatSwitchFromDb == Constants.UserSettings.REPEAT_SWITCH_STATUS_ON;
+
+        activateSwitches();
+    }
+
+    // Switch the Switches on or off when the application starts
+    private void activateSwitches() {
+        if (isShuffleSongsSwitchOn) {
+            shuffleSongsSwitch.setChecked(true);
+        } else {
+            shuffleSongsSwitch.setChecked(false);
+        }
+
+        if (isRepeatSongSwitchOn) {
+            repeatSongSwitch.setChecked(true);
+        } else {
+            repeatSongSwitch.setChecked(false);
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
@@ -170,15 +211,11 @@ public class MusicPlayer extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_default_theme:
-                setSelectedThemes(lightGreenColour, redColour);
-                isDefaultThemeOn = true;
-                isDarkThemeOn = false;
+                updateDefaultThemeMenuItemOption();
                 Log.i(Constants.LogTags.MUSIC_TAG, "Menu Default Theme selected!");
                 break;
             case R.id.item_dark_theme:
-                setSelectedThemes(redColour, yellowColour);
-                isDefaultThemeOn = false;
-                isDarkThemeOn = true;
+                updateDarkThemeMenuItemOption();
                 Log.i(Constants.LogTags.MUSIC_TAG, "Menu Dark Theme selected!");
                 break;
             case R.id.item_tags:
@@ -194,6 +231,20 @@ public class MusicPlayer extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    // Update Default Theme Item option
+    private void updateDefaultThemeMenuItemOption() {
+        setSelectedThemes(lightGreenColour, redColour);
+        isDefaultThemeOn = true;
+        isDarkThemeOn = false;
+    }
+
+    // Update Dark Theme Item option
+    private void updateDarkThemeMenuItemOption() {
+        setSelectedThemes(redColour, yellowColour);
+        isDefaultThemeOn = false;
+        isDarkThemeOn = true;
     }
 
     // Set the Light or Dark Theme from the Menu Selection

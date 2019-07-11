@@ -11,7 +11,7 @@ public class RealmController {
         //realm.executeTransaction(r -> r.delete(UserSettingsModel.class));
         realm.executeTransaction(r -> {
             UserSettingsModel userSettingsRealm = new UserSettingsModel();
-            userSettingsRealm.setId(1);
+            userSettingsRealm.setId(Constants.RealmDB.DEFAULT_USER_SETTINGS_REALM_ID);
             userSettingsRealm.setDefaultThemeStatus(defaultThemeStatus);
             userSettingsRealm.setDarkThemeStatus(darkThemeStatus);
             userSettingsRealm.setShuffleSwitchStatus(shuffleSwitchStatus);
@@ -19,11 +19,11 @@ public class RealmController {
             realm.insertOrUpdate(userSettingsRealm);
         });
 
-        getUserSettings(realm);
+        confirmUserSettingsSavedToDb(realm);
     }
 
-    // Retrieve User Settings from Realm DB
-    private static void getUserSettings(Realm realm) {
+    // Display User Settings from Realm DB
+    private static void confirmUserSettingsSavedToDb(Realm realm) {
         final UserSettingsModel settings = realm.where(UserSettingsModel.class).findFirst();
         assert settings != null;
 
@@ -33,26 +33,9 @@ public class RealmController {
                         "\nShuffle Switch: " + settings.getShuffleSwitchStatus() +
                         "\nRepeat Switch: " + settings.getRepeatSwitchStatus());
     }
+
+    // Retrieve User Settings from Realm DB
+    public static UserSettingsModel getUserSettingsFromDb(Realm realm) {
+        return realm.where(UserSettingsModel.class).equalTo("id", Constants.RealmDB.DEFAULT_USER_SETTINGS_REALM_ID).findFirst();
+    }
 }
-
-
-// Set up the Default Realm Configuration for the Application
-//    private static RealmConfiguration createDefaultRealmConfiguration() {
-//        // Generate the random Encryption Key
-//        byte [] encryptionKey = new byte [64];
-//        new SecureRandom().nextBytes(encryptionKey);
-//
-//        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
-//                .name(Constants.RealmDB.DEFAULT_REALM_CONFIGURATION_NAME)
-//                .encryptionKey(encryptionKey)
-//                .schemaVersion(0)
-//                .deleteRealmIfMigrationNeeded()
-//                .build();
-//        Realm.setDefaultConfiguration(realmConfiguration);
-//        return realmConfiguration;
-//    }
-
-// Get the instance of Realm
-//    private static Realm getRealmInstance() {
-//        return Realm.getInstance(createDefaultRealmConfiguration());
-//    }

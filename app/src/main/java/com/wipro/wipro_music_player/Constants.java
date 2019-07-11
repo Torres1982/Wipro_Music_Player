@@ -40,5 +40,6 @@ public class Constants {
     // Holds the Realm Database corresponding Constants
     public interface RealmDB {
         String DEFAULT_REALM_CONFIGURATION_NAME = NotificationIdentifier.NOTIFICATION_CHANNEL_ID + ".realm";
+        int DEFAULT_USER_SETTINGS_REALM_ID = 1;
     }
 }
