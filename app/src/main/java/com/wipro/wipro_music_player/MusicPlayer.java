@@ -34,7 +34,7 @@ import android.widget.Toast;
 import com.wipro.wipro_music_player.controller.RealmController;
 import com.wipro.wipro_music_player.model.UserSettingsModel;
 import com.wipro.wipro_music_player.util.ConverterUtility;
-import com.wipro.wipro_music_player.SongModel;
+import com.wipro.wipro_music_player.model.SongModel;
 
 import java.io.IOException;
 import java.util.ArrayList;

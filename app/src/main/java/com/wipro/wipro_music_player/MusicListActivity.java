@@ -13,11 +13,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
+import com.wipro.wipro_music_player.util.SortUtility;
 import com.wipro.wipro_music_player.util.PermissionUtility;
-import com.wipro.wipro_music_player.SongModel;
+import com.wipro.wipro_music_player.model.SongModel;
 import java.util.ArrayList;
 import java.util.List;
-import static java.util.Comparator.comparing;
 
 public class MusicListActivity extends AppCompatActivity {
     static List<SongModel> musicList;
@@ -29,7 +29,7 @@ public class MusicListActivity extends AppCompatActivity {
 
         PermissionUtility.checkStoragePermissions(getApplicationContext(), this);
         musicList = getAllAudioFromDevice(this);
-        sortMusicListByArtist();
+        SortUtility.sortMusicListAscendingByArtist(musicList);
         List<SongModel> music = new ArrayList<>();
 
         for (int i = 0; i < musicList.size(); i++) {
@@ -97,10 +97,6 @@ public class MusicListActivity extends AppCompatActivity {
             Log.i(Constants.LogTags.MUSIC_TAG, message);
         }
         return listOfSongs;
-    }
-
-    private void sortMusicListByArtist() {
-        musicList.sort(comparing(SongModel::getArtist));
     }
 
     @Override

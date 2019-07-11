@@ -10,9 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import java.util.List;
-import com.wipro.wipro_music_player.SongModel;
+import com.wipro.wipro_music_player.model.SongModel;
 
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> {
     private List<SongModel> listOfSongs;
@@ -35,20 +34,17 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.ViewHolder> 
         viewHolder.artistTextView.setText(listOfSongs.get(position).getArtist());
         viewHolder.titleTextView.setText(listOfSongs.get(position).getTitle());
 
-        viewHolder.linearLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle extras = new Bundle();
-                extras.putString("artist_name", songsList.getArtist());
-                extras.putString("song_title", songsList.getTitle());
-                extras.putString("song_path", songsList.getPath());
-                extras.putLong("song_length", songsList.getLength());
-                extras.putDouble("song_size", songsList.getSize());
-                extras.putInt("song_position", position);
-                Intent musicPlayerIntent = new Intent(v.getContext(), MusicPlayer.class);
-                musicPlayerIntent.putExtras(extras);
-                v.getContext().startActivity(musicPlayerIntent);
-            }
+        viewHolder.linearLayout.setOnClickListener(v -> {
+            Bundle extras = new Bundle();
+            extras.putString("artist_name", songsList.getArtist());
+            extras.putString("song_title", songsList.getTitle());
+            extras.putString("song_path", songsList.getPath());
+            extras.putLong("song_length", songsList.getLength());
+            extras.putDouble("song_size", songsList.getSize());
+            extras.putInt("song_position", position);
+            Intent musicPlayerIntent = new Intent(v.getContext(), MusicPlayer.class);
+            musicPlayerIntent.putExtras(extras);
+            v.getContext().startActivity(musicPlayerIntent);
         });
     }
 
