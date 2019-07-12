@@ -12,6 +12,7 @@
     <string name="item_favourites">Add to Favourites</string>
     <string name="item_about">About</string>
     <string name="item_sort">Sort</string>
+    <string name="item_sort_by_default">Sort by Default</string>
     <string name="item_sort_by_artist">Sort by Artist</string>
     <string name="item_sort_by_title">Sort by Title</string>
     <string name="footer_text">Arturro Torres | Wipro</string>

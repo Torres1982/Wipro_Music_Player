@@ -16,7 +16,6 @@
                     android:id="@+id/item_default_theme"
                     android:title="@string/default_theme"
                     app:showAsAction="never" />
-
                 <item
                     android:id="@+id/item_dark_theme"
                     android:title="@string/item_dark_theme"
@@ -31,7 +30,6 @@
             android:id="@+id/item_tags"
             android:title="@string/item_tags"
             app:showAsAction="never" />
-
         <item
             android:id="@+id/item_favourites"
             android:title="@string/item_favourites"

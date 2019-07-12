@@ -35,33 +35,6 @@ public class MusicListActivity extends AppCompatActivity {
         setUpRecyclerViewAndAdapter();
     }
 
-    // Prepare Recycler View and Adapter
-    private void setUpRecyclerViewAndAdapter() {
-        List<SongModel> music = new ArrayList<>();
-
-        for (int i = 0; i < musicList.size(); i++) {
-            music.add(new SongModel(musicList.get(i).getArtist(),
-                    musicList.get(i).getTitle(),
-                    musicList.get(i).getPath(),
-                    musicList.get(i).getLength(),
-                    musicList.get(i).getSize()));
-        }
-
-        MusicAdapter musicAdapter = new MusicAdapter(music);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        RecyclerView recycler = findViewById(R.id.recycler_view);
-        Drawable divider = ContextCompat.getDrawable(recycler.getContext(), R.drawable.divider);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recycler.getContext(), layoutManager.getOrientation());
-
-        assert divider != null;
-        dividerItemDecoration.setDrawable(divider);
-
-        recycler.setHasFixedSize(true);
-        recycler.setLayoutManager(layoutManager);
-        recycler.addItemDecoration(dividerItemDecoration);
-        recycler.setAdapter(musicAdapter);
-    }
-
     // retrieve all the mp3 files from the External SD Card
     public List<SongModel> getAllAudioFromDevice(final Context context) {
         List<SongModel> listOfSongs = new ArrayList<>();
@@ -94,7 +67,6 @@ public class MusicListActivity extends AppCompatActivity {
                 songModel.setLength(duration);
                 songModel.setSize(size);
                 listOfSongs.add(songModel);
-
                 //Log.i(Constants.LogTags.MUSIC_TAG, "ARTIST: " + artist + ". TITLE: " + title + ". LENGTH: " + duration + ". SIZE: " + size + ". PATH: " + path);
             }
             cursor.close();
@@ -104,6 +76,33 @@ public class MusicListActivity extends AppCompatActivity {
             Log.i(Constants.LogTags.MUSIC_TAG, message);
         }
         return listOfSongs;
+    }
+
+    // Prepare Recycler View and Adapter
+    private void setUpRecyclerViewAndAdapter() {
+        List<SongModel> music = new ArrayList<>();
+
+        for (int i = 0; i < musicList.size(); i++) {
+            music.add(new SongModel(musicList.get(i).getArtist(),
+                    musicList.get(i).getTitle(),
+                    musicList.get(i).getPath(),
+                    musicList.get(i).getLength(),
+                    musicList.get(i).getSize()));
+        }
+
+        MusicAdapter musicAdapter = new MusicAdapter(music);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        RecyclerView recycler = findViewById(R.id.recycler_view);
+        Drawable divider = ContextCompat.getDrawable(recycler.getContext(), R.drawable.divider);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recycler.getContext(), layoutManager.getOrientation());
+
+        assert divider != null;
+        dividerItemDecoration.setDrawable(divider);
+
+        recycler.setHasFixedSize(true);
+        recycler.setLayoutManager(layoutManager);
+        recycler.addItemDecoration(dividerItemDecoration);
+        recycler.setAdapter(musicAdapter);
     }
 
     @Override
@@ -116,20 +115,25 @@ public class MusicListActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        musicList = getAllAudioFromDevice(this);
+        String sortMethod;
+
         switch (item.getItemId()) {
+            case R.id.item_sort_by_default:
+                sortMethod = "Default";
+                break;
             case R.id.item_sort_by_artist:
-                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Item - Sort by Artist selected!");
-                musicList = getAllAudioFromDevice(this);
+                sortMethod = "Artist";
                 SortUtility.sortMusicListAscendingByArtist(musicList);
                 break;
             case R.id.item_sort_by_title:
-                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Item - Sort by Title selected!");
-                musicList = getAllAudioFromDevice(this);
+                sortMethod = "Title";
                 SortUtility.sortMusicListAscendingBySongTitle(musicList);
                 break;
             default:
                 return super.onOptionsItemSelected(item);
         }
+        Log.i(Constants.LogTags.MUSIC_TAG, "Menu Item - Sort by " + sortMethod + " Selected!");
         setUpRecyclerViewAndAdapter();
         return true;
     }

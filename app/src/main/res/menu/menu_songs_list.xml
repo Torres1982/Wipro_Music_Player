@@ -13,10 +13,13 @@
             app:showAsAction="ifRoom">
             <menu>
                 <item
+                    android:id="@+id/item_sort_by_default"
+                    android:title="@string/item_sort_by_default"
+                    app:showAsAction="never" />
+                <item
                     android:id="@+id/item_sort_by_artist"
                     android:title="@string/item_sort_by_artist"
                     app:showAsAction="never" />
-
                 <item
                     android:id="@+id/item_sort_by_title"
                     android:title="@string/item_sort_by_title"
