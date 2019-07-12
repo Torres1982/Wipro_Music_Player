@@ -2,6 +2,7 @@ package com.wipro.wipro_music_player.controller;
 
 import android.util.Log;
 import com.wipro.wipro_music_player.Constants;
+import com.wipro.wipro_music_player.model.FavouriteSongModel;
 import com.wipro.wipro_music_player.model.UserSettingsModel;
 import io.realm.Realm;
 
@@ -37,5 +38,22 @@ public class RealmController {
     // Retrieve User Settings from Realm DB
     public static UserSettingsModel getUserSettingsFromDb(Realm realm) {
         return realm.where(UserSettingsModel.class).equalTo("id", Constants.RealmDB.DEFAULT_USER_SETTINGS_REALM_ID).findFirst();
+    }
+
+    // Check if the chosen Song is in the Favourite Songs list
+    public static  FavouriteSongModel checkIfSongIsInRealmDBbySongPath(Realm realm, String songPath) {
+        return realm.where(FavouriteSongModel.class).equalTo("songPath", songPath).findFirst();
+    }
+
+    // Add the chosen song to the Favourite Songs list
+    public static void addSongToFavourites(Realm realm, String title, String artist, String path, long length, double size) {
+        realm.executeTransaction(r -> {
+            FavouriteSongModel favouriteSong = new FavouriteSongModel();
+        });
+    }
+
+    // Check the max id in the Favourite Song DB
+    public static Number checkTheMaxFavouriteSongIdFromRealmDb(Realm realm) {
+        return realm.where(FavouriteSongModel.class).max("id");
     }
 }

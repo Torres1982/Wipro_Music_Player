@@ -5,6 +5,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MusicPlayer">
 
+    <item
+        android:id="@+id/item_favourites"
+        android:icon="@drawable/icon_favourite_off"
+        app:showAsAction="ifRoom"
+        tools:ignore="MenuTitle" />
+
     <group
         android:id="@+id/group_themes">
         <item
@@ -24,17 +30,10 @@
         </item>
     </group>
 
-    <group
-        android:id="@+id/group_fancy">
-        <item
-            android:id="@+id/item_tags"
-            android:title="@string/item_tags"
-            app:showAsAction="never" />
-        <item
-            android:id="@+id/item_favourites"
-            android:title="@string/item_favourites"
-            app:showAsAction="never"/>
-    </group>
+    <item
+        android:id="@+id/item_tags"
+        android:title="@string/item_tags"
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/item_about"
