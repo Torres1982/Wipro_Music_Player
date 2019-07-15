@@ -56,10 +56,10 @@ public class MusicPlayer extends AppCompatActivity {
     private int songCurrentPosition;
     private int animationScale;
     private List<SongModel> listOfSongs = new ArrayList<>();
-    private String artistNewSong;
-    private String titleNewSong;
-    private double sizeNewSong;
-    private long durationNewSong;
+    private String artistNewSong, currentSongArtist;
+    private String titleNewSong, currentSongTitle;
+    private double sizeNewSong, currentSongSize;
+    private long durationNewSong, currentSongLength;
     private Handler musicHandler = new Handler();
     public static NotificationManager notificationManager;
     private static AudioManager audioManager;
@@ -77,7 +77,6 @@ public class MusicPlayer extends AppCompatActivity {
     private Realm realm;
     private UserSettingsModel userSettingsFromRealmDb;
     private FavouriteSongModel favouriteSongFromRealmDb;
-    private int favouriteSongId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,12 +109,8 @@ public class MusicPlayer extends AppCompatActivity {
         shuffleSongsSwitch = findViewById(R.id.switch_shuffle);
         repeatSongSwitch = findViewById(R.id.switch_repeat);
         constraintLayout = findViewById(R.id.music_player_main_layout);
-        // Action Bar Menu Items
-//        MenuItem itemFavourites = findViewById(R.id.item_favourites);
-//        MenuItem itemDefaultTheme = findViewById(R.id.item_default_theme);
-//        MenuItem itemDarkTheme = findViewById(R.id.item_dark_theme);
-//        MenuItem itemTags = findViewById(R.id.item_tags);
-//        MenuItem itemAbout = findViewById(R.id.item_about);
+
+        // Action Bar Menu
         isDefaultThemeOn = true;
         isDarkThemeOn = false;
 
@@ -147,7 +142,12 @@ public class MusicPlayer extends AppCompatActivity {
         // Realm DB
         realm = Realm.getDefaultInstance();
         userSettingsFromRealmDb = RealmController.getUserSettingsFromDb(realm);
-        favouriteSongId = setFavouriteSongNextUniqueId();
+
+        // Currently Playing Song details
+        currentSongTitle = listOfSongs.get(songIndex).getTitle();
+        currentSongArtist = listOfSongs.get(songIndex).getArtist();
+        currentSongLength = listOfSongs.get(songIndex).getLength();
+        currentSongSize = listOfSongs.get(songIndex).getSize();
 
         setUpThemesWithSettingsFromRealmDb();
         setUpSwitchesWithSettingsFromRealmDb();
@@ -202,6 +202,25 @@ public class MusicPlayer extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        setFavouriteSongMenuItemIcon(menu);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    // Set the Icon for Favourite Song on the Menu Bar
+    private void setFavouriteSongMenuItemIcon(Menu menu) {
+        MenuItem settingsItem = menu.findItem(R.id.item_favourites);
+        // Check if the Playing song is in the Favourite Songs list in DB, and change the icon accordingly
+        favouriteSongFromRealmDb = RealmController.checkIfSongIsInRealmDBbySongPath(realm, path);
+
+        if (favouriteSongFromRealmDb == null) {
+            settingsItem.setIcon(ContextCompat.getDrawable(this, R.drawable.icon_favourite_off));
+        } else {
+            settingsItem.setIcon(ContextCompat.getDrawable(this, R.drawable.icon_favourite_on));
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.menu, menu);
@@ -213,22 +232,18 @@ public class MusicPlayer extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.item_favourites:
-                // 1. Check if the song is in the Realm DB by the song path
                 favouriteSongFromRealmDb = RealmController.checkIfSongIsInRealmDBbySongPath(realm, path);
+                Log.i(Constants.LogTags.MUSIC_TAG, "Is song Found in DB? " + favouriteSongFromRealmDb);
 
                 if (favouriteSongFromRealmDb == null) {
-                    Log.i(Constants.LogTags.MUSIC_TAG, "No Song found! " + favouriteSongId);
+                    RealmController.addSongToFavourites(realm, currentSongTitle, currentSongArtist, path, currentSongLength, currentSongSize);
+                    item.setIcon(R.drawable.icon_favourite_on);
+                    Log.i(Constants.LogTags.MUSIC_TAG, "No Song found! Added To Favourites! " + path);
                 } else {
-                    Log.i(Constants.LogTags.MUSIC_TAG, "Song Found " + path);
+                    RealmController.removeSongFromFavourites(realm, path);
+                    item.setIcon(R.drawable.icon_favourite_off);
+                    Log.i(Constants.LogTags.MUSIC_TAG, "Song Found! Removed from Favourites! " + path);
                 }
-
-                // a) if it's not:
-                //      - add the song to DB
-                //      - switch the Favourite Star on
-                // b) if the song is in the DB
-                //      - remove the song from DB
-                //      - switch the Favourite Star off
-                //Log.i(Constants.LogTags.MUSIC_TAG, "Menu Favourites selected!");
                 break;
             case R.id.item_default_theme:
                 updateDefaultThemeMenuItemOption();
@@ -248,20 +263,6 @@ public class MusicPlayer extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
         return true;
-    }
-
-    // Set the Favourite Song id (based on the max id in Realm DB)
-    private int setFavouriteSongNextUniqueId() {
-        Number songId = RealmController.checkTheMaxFavouriteSongIdFromRealmDb(realm);
-
-        if (songId == null) {
-            favouriteSongId = 1;
-        } else {
-            favouriteSongId = songId.intValue() + 1;
-        }
-
-        Log.i(Constants.LogTags.MUSIC_TAG, "Next Favourite Song Id is " + favouriteSongId);
-        return favouriteSongId;
     }
 
     // Update Default Theme Item option
@@ -436,6 +437,7 @@ public class MusicPlayer extends AppCompatActivity {
         songTitle.setText(title);
         songSize.setText(stringSongSize);
         songLength.setText(songDuration);
+        invalidateOptionsMenu();
     }
 
     // Updating Seek Bar progress

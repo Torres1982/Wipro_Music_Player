@@ -4,6 +4,9 @@ import android.util.Log;
 import com.wipro.wipro_music_player.Constants;
 import com.wipro.wipro_music_player.model.FavouriteSongModel;
 import com.wipro.wipro_music_player.model.UserSettingsModel;
+
+import java.util.Objects;
+
 import io.realm.Realm;
 
 public class RealmController {
@@ -19,7 +22,6 @@ public class RealmController {
             userSettingsRealm.setRepeatSwitchStatus(repeatSwitchStatus);
             realm.insertOrUpdate(userSettingsRealm);
         });
-
         confirmUserSettingsSavedToDb(realm);
     }
 
@@ -49,11 +51,37 @@ public class RealmController {
     public static void addSongToFavourites(Realm realm, String title, String artist, String path, long length, double size) {
         realm.executeTransaction(r -> {
             FavouriteSongModel favouriteSong = new FavouriteSongModel();
+            favouriteSong.setId(setFavouriteSongNextUniqueId(realm));
+            favouriteSong.setSongTitle(title);
+            favouriteSong.setSongArtist(artist);
+            favouriteSong.setSongPath(path);
+            favouriteSong.setSongLength(length);
+            favouriteSong.setSongSize(size);
+            realm.insert(favouriteSong);
         });
     }
 
     // Check the max id in the Favourite Song DB
-    public static Number checkTheMaxFavouriteSongIdFromRealmDb(Realm realm) {
+    private static Number checkTheMaxFavouriteSongIdFromRealmDb(Realm realm) {
         return realm.where(FavouriteSongModel.class).max("id");
+    }
+
+    // Set the Favourite Song id (based on the max id in Realm DB)
+    private static int setFavouriteSongNextUniqueId(Realm realm) {
+        int favouriteSongId;
+        Number songId = checkTheMaxFavouriteSongIdFromRealmDb(realm);
+
+        if (songId == null) {
+            favouriteSongId = 1;
+        } else {
+            favouriteSongId = songId.intValue() + 1;
+        }
+        Log.i(Constants.LogTags.MUSIC_TAG, "Next Favourite Song Id is " + favouriteSongId);
+        return favouriteSongId;
+    }
+
+    // Remove the chosen song from the Favourite Songs list
+    public static void removeSongFromFavourites(Realm realm, String path) {
+        realm.executeTransaction(r -> Objects.requireNonNull(realm.where(FavouriteSongModel.class).equalTo("songPath", path).findFirst()).deleteFromRealm());
     }
 }
