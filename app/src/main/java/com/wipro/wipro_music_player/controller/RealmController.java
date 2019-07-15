@@ -101,4 +101,12 @@ public class RealmController {
         RealmResults<FavouriteSongModel> results = realm.where(FavouriteSongModel.class).findAll();
         return new ArrayList<>(results);
     }
+
+    // Update the Song List Status
+    public static void updateUserSettingsSongListStatus(Realm realm, int songStatus) {
+        realm.executeTransaction(r -> {
+            UserSettingsModel settings = getUserSettingsFromDb(realm);
+            settings.setSongsListStatus(songStatus);
+        });
+    }
 }

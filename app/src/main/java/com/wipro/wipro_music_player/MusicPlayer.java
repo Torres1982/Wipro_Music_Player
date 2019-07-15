@@ -143,10 +143,15 @@ public class MusicPlayer extends AppCompatActivity {
         // Realm DB
         realm = Realm.getDefaultInstance();
         userSettingsFromRealmDb = RealmController.getUserSettingsFromDb(realm);
-        isFavouriteSongsListOn = userSettingsFromRealmDb.getSongsListStatus() == Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS;
 
-        setUpThemesWithSettingsFromRealmDb();
-        setUpSwitchesWithSettingsFromRealmDb();
+        if (userSettingsFromRealmDb != null) {
+            isFavouriteSongsListOn = userSettingsFromRealmDb.getSongsListStatus() == Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS;
+            setUpThemesWithSettingsFromRealmDb();
+            setUpSwitchesWithSettingsFromRealmDb();
+        } else {
+            isFavouriteSongsListOn = false;
+        }
+
         startViewAnimation(footer, animationTranslate);
         updateViewDetails(artist, title, size, length);
         setSeekBarListener();
@@ -349,7 +354,7 @@ public class MusicPlayer extends AppCompatActivity {
     private void setPlayPreviousSongListener() {
         previousSong.setOnClickListener(v -> {
             startViewAnimation(previousSong, animationScale);
-            showToastMessageAndLogMessageTogether("Playing Previous Song!");
+            Log.i(Constants.LogTags.MUSIC_TAG, "Switched to Previous Song!");
 
             if (songIndex == 0) {
                 songIndex = listOfSongs.size() - 1;
@@ -485,7 +490,7 @@ public class MusicPlayer extends AppCompatActivity {
 
     // Playing the Next Song either the 'Next Song' button is clicked or automatically play the song when the previous song has finished playing
     private void switchToNextSong() {
-        showToastMessageAndLogMessageTogether("Playing Next Song!");
+        Log.i(Constants.LogTags.MUSIC_TAG, "Switched to Next Song!");
 
         if (isRepeatSongSwitchOn) {
             Log.i(Constants.LogTags.MUSIC_TAG, "Song at index " + songIndex + " is repeated!");
@@ -716,6 +721,13 @@ public class MusicPlayer extends AppCompatActivity {
         }
 
         // Manage Song Lists
+//        if (userSettingsFromRealmDb != null) {
+//            songsListStatus = userSettingsFromRealmDb.getSongsListStatus();
+//            isFavouriteSongsListOn = songsListStatus == Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS;
+//        } else {
+//            isFavouriteSongsListOn = false;
+//        }
+
         if (isFavouriteSongsListOn) {
             songsListStatus = Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS;
         } else {

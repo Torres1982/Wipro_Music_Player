@@ -42,37 +42,29 @@ public class MusicListActivity extends AppCompatActivity {
         //RealmController.removeAllSongsFromFavourites(realm);
         realm = Realm.getDefaultInstance();
         userSettingsFromRealmDb = RealmController.getUserSettingsFromDb(realm);
-        setUpSongListFromUserSettingsFromRealmDb();
-        //musicList = switchSongsList();
-        //musicList = getAllAudioFromDevice(this);
-        //musicList = getListOfFavouriteSongsFromRealmDb();
+        setUpMusicListCheckIfUserSettingsFromRealmDbIsNotEmpty();
         setUpRecyclerViewAndAdapter();
+    }
+
+    // Check if the User Settings from the Real DB is Empty or not
+    private void setUpMusicListCheckIfUserSettingsFromRealmDbIsNotEmpty() {
+        if (userSettingsFromRealmDb != null) {
+            setUpSongListFromUserSettingsFromRealmDb();
+        } else {
+            musicList = getAllAudioFromDevice(this);
+        }
     }
 
     // Initial Set Up of Song List according to the settings retrieved from Realm DB
     private void setUpSongListFromUserSettingsFromRealmDb() {
         int defaultSongListFromDb = userSettingsFromRealmDb.getSongsListStatus();
 
-        if (userSettingsFromRealmDb != null) {
-            if (defaultSongListFromDb == Constants.UserSettings.SONGS_LIST_STATUS_ALL_SONGS) {
-                musicList = getAllAudioFromDevice(this);
-            } else if (defaultSongListFromDb == Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS) {
-                musicList = getListOfFavouriteSongsFromRealmDb();
-            }
-        } else {
+        if (defaultSongListFromDb == Constants.UserSettings.SONGS_LIST_STATUS_ALL_SONGS) {
+            musicList = getAllAudioFromDevice(this);
+        } else if (defaultSongListFromDb == Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS) {
             musicList = getListOfFavouriteSongsFromRealmDb();
         }
     }
-
-    // Select the appropriate Song List depending on the User's choice (selected through the Menu Item)
-//    private List<SongModel> switchSongsList() {
-//        if (isFavouriteSongsListOn) { TODO Replace this with the settings from the Realm DB
-//            musicList = getListOfFavouriteSongsFromRealmDb();
-//        } else {
-//            musicList = getAllAudioFromDevice(this);
-//        }
-//        return musicList;
-//    }
 
     // Retrieve all the mp3 files from the External SD Card
     public List<SongModel> getAllAudioFromDevice(final Context context) {
@@ -106,13 +98,11 @@ public class MusicListActivity extends AppCompatActivity {
                 songModel.setLength(duration);
                 songModel.setSize(size);
                 listOfSongs.add(songModel);
-                //Log.i(Constants.LogTags.MUSIC_TAG, "ARTIST: " + artist + ". TITLE: " + title + ". LENGTH: " + duration + ". SIZE: " + size + ". PATH: " + path);
+                Log.i(Constants.LogTags.MUSIC_TAG, "ARTIST: " + artist + ". TITLE: " + title + ". LENGTH: " + duration + ". SIZE: " + size + ". PATH: " + path);
             }
             cursor.close();
         } else {
-            String message = "Music List is Empty!";
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-            Log.i(Constants.LogTags.MUSIC_TAG, message);
+            setUpToastAndLogMessages("All Songs List is Empty!");
         }
         return listOfSongs;
     }
@@ -122,17 +112,27 @@ public class MusicListActivity extends AppCompatActivity {
         List<SongModel> favouriteSongsList = new ArrayList<>();
         List<FavouriteSongModel> songsListFromDb = RealmController.getFavouriteSongsFromRealmDb(realm);
 
-        for (FavouriteSongModel song: songsListFromDb) {
-            SongModel songModel = new SongModel();
-            songModel.setArtist(song.getSongArtist());
-            songModel.setTitle(song.getSongTitle());
-            songModel.setPath(song.getSongPath());
-            songModel.setLength(song.getSongLength());
-            songModel.setSize(song.getSongSize());
-            favouriteSongsList.add(songModel);
-            //Log.i(Constants.LogTags.MUSIC_TAG, "ARTIST: " + song.getSongArtist() + ". TITLE: " + song.getSongTitle() + ". LENGTH: " + song.getSongLength() + ". SIZE: " + song.getSongSize() + ". PATH: " + song.getSongPath());
+        if (!songsListFromDb.isEmpty()) {
+            for (FavouriteSongModel song : songsListFromDb) {
+                SongModel songModel = new SongModel();
+                songModel.setArtist(song.getSongArtist());
+                songModel.setTitle(song.getSongTitle());
+                songModel.setPath(song.getSongPath());
+                songModel.setLength(song.getSongLength());
+                songModel.setSize(song.getSongSize());
+                favouriteSongsList.add(songModel);
+                Log.i(Constants.LogTags.MUSIC_TAG, "ARTIST: " + song.getSongArtist() + ". TITLE: " + song.getSongTitle() + ". LENGTH: " + song.getSongLength() + ". SIZE: " + song.getSongSize() + ". PATH: " + song.getSongPath());
+            }
+        } else {
+            setUpToastAndLogMessages("Favourite Songs List is Empty!");
         }
         return favouriteSongsList;
+    }
+
+    // Set Up Messages for Toast and Log
+    private void setUpToastAndLogMessages(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        Log.i(Constants.LogTags.MUSIC_TAG, message);
     }
 
     // Prepare Recycler View and Adapter
@@ -172,31 +172,35 @@ public class MusicListActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        String partialMessageString = "Menu Item - ";
+        String messageString;
 
         switch (item.getItemId()) {
             case R.id.item_select_all_songs_list:
                 musicList = getAllAudioFromDevice(this);
-                addSortMethodAndLogMessageAndRecyclerViewAndAdapterTogether(partialMessageString + "All Songs List Selected!");
+                messageString = "Menu Item - All Songs List Selected!";
+                RealmController.updateUserSettingsSongListStatus(realm, Constants.UserSettings.SONGS_LIST_STATUS_ALL_SONGS);
                 break;
             case R.id.item_select_favourite_songs_list:
                 musicList = getListOfFavouriteSongsFromRealmDb();
-                addSortMethodAndLogMessageAndRecyclerViewAndAdapterTogether(partialMessageString + "Favourite Songs List Selected!");
+                messageString = "Menu Item - Favourite Songs List Selected!";
+                RealmController.updateUserSettingsSongListStatus(realm, Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS);
                 break;
             case R.id.item_sort_by_default:
-                addSortMethodAndLogMessageAndRecyclerViewAndAdapterTogether(partialMessageString + "Sort by Default Selected!");
+                setUpMusicListCheckIfUserSettingsFromRealmDbIsNotEmpty();
+                messageString = "Menu Item - Sort by Default Selected!";
                 break;
             case R.id.item_sort_by_artist:
                 SortUtility.sortMusicListAscendingByArtist(musicList);
-                addSortMethodAndLogMessageAndRecyclerViewAndAdapterTogether(partialMessageString + "Sort by Artist Selected!");
+                messageString = "Menu Item - Sort by Artist Selected!";
                 break;
             case R.id.item_sort_by_title:
                 SortUtility.sortMusicListAscendingBySongTitle(musicList);
-                addSortMethodAndLogMessageAndRecyclerViewAndAdapterTogether(partialMessageString + "Sort by Title Selected!");
+                messageString = "Menu Item - Sort by Title Selected!";
                 break;
             default:
                 return super.onOptionsItemSelected(item);
         }
+        addSortMethodAndLogMessageAndRecyclerViewAndAdapterTogether(messageString);
         return true;
     }
 
@@ -210,5 +214,6 @@ public class MusicListActivity extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         Log.i(Constants.LogTags.MUSIC_TAG, "Application Has Closed!");
+        realm.close();
     }
 }
