@@ -16,14 +16,22 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
+
+import com.wipro.wipro_music_player.controller.RealmController;
+import com.wipro.wipro_music_player.model.FavouriteSongModel;
+import com.wipro.wipro_music_player.model.UserSettingsModel;
 import com.wipro.wipro_music_player.util.SortUtility;
 import com.wipro.wipro_music_player.util.PermissionUtility;
 import com.wipro.wipro_music_player.model.SongModel;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
+
 public class MusicListActivity extends AppCompatActivity {
     static List<SongModel> musicList;
+    private Realm realm;
+    private UserSettingsModel userSettingsFromRealmDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,11 +39,42 @@ public class MusicListActivity extends AppCompatActivity {
         setContentView(R.layout.songs_list);
 
         PermissionUtility.checkStoragePermissions(getApplicationContext(), this);
-        musicList = getAllAudioFromDevice(this);
+        //RealmController.removeAllSongsFromFavourites(realm);
+        realm = Realm.getDefaultInstance();
+        userSettingsFromRealmDb = RealmController.getUserSettingsFromDb(realm);
+        setUpSongListFromUserSettingsFromRealmDb();
+        //musicList = switchSongsList();
+        //musicList = getAllAudioFromDevice(this);
+        //musicList = getListOfFavouriteSongsFromRealmDb();
         setUpRecyclerViewAndAdapter();
     }
 
-    // retrieve all the mp3 files from the External SD Card
+    // Initial Set Up of Song List according to the settings retrieved from Realm DB
+    private void setUpSongListFromUserSettingsFromRealmDb() {
+        int defaultSongListFromDb = userSettingsFromRealmDb.getSongsListStatus();
+
+        if (userSettingsFromRealmDb != null) {
+            if (defaultSongListFromDb == Constants.UserSettings.SONGS_LIST_STATUS_ALL_SONGS) {
+                musicList = getAllAudioFromDevice(this);
+            } else if (defaultSongListFromDb == Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS) {
+                musicList = getListOfFavouriteSongsFromRealmDb();
+            }
+        } else {
+            musicList = getListOfFavouriteSongsFromRealmDb();
+        }
+    }
+
+    // Select the appropriate Song List depending on the User's choice (selected through the Menu Item)
+//    private List<SongModel> switchSongsList() {
+//        if (isFavouriteSongsListOn) { TODO Replace this with the settings from the Realm DB
+//            musicList = getListOfFavouriteSongsFromRealmDb();
+//        } else {
+//            musicList = getAllAudioFromDevice(this);
+//        }
+//        return musicList;
+//    }
+
+    // Retrieve all the mp3 files from the External SD Card
     public List<SongModel> getAllAudioFromDevice(final Context context) {
         List<SongModel> listOfSongs = new ArrayList<>();
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -78,6 +117,24 @@ public class MusicListActivity extends AppCompatActivity {
         return listOfSongs;
     }
 
+    // Generate the list of Favourite Songs from the Realm DB
+    public List<SongModel> getListOfFavouriteSongsFromRealmDb() {
+        List<SongModel> favouriteSongsList = new ArrayList<>();
+        List<FavouriteSongModel> songsListFromDb = RealmController.getFavouriteSongsFromRealmDb(realm);
+
+        for (FavouriteSongModel song: songsListFromDb) {
+            SongModel songModel = new SongModel();
+            songModel.setArtist(song.getSongArtist());
+            songModel.setTitle(song.getSongTitle());
+            songModel.setPath(song.getSongPath());
+            songModel.setLength(song.getSongLength());
+            songModel.setSize(song.getSongSize());
+            favouriteSongsList.add(songModel);
+            //Log.i(Constants.LogTags.MUSIC_TAG, "ARTIST: " + song.getSongArtist() + ". TITLE: " + song.getSongTitle() + ". LENGTH: " + song.getSongLength() + ". SIZE: " + song.getSongSize() + ". PATH: " + song.getSongPath());
+        }
+        return favouriteSongsList;
+    }
+
     // Prepare Recycler View and Adapter
     private void setUpRecyclerViewAndAdapter() {
         List<SongModel> music = new ArrayList<>();
@@ -115,27 +172,38 @@ public class MusicListActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        musicList = getAllAudioFromDevice(this);
-        String sortMethod;
+        String partialMessageString = "Menu Item - ";
 
         switch (item.getItemId()) {
+            case R.id.item_select_all_songs_list:
+                musicList = getAllAudioFromDevice(this);
+                addSortMethodAndLogMessageAndRecyclerViewAndAdapterTogether(partialMessageString + "All Songs List Selected!");
+                break;
+            case R.id.item_select_favourite_songs_list:
+                musicList = getListOfFavouriteSongsFromRealmDb();
+                addSortMethodAndLogMessageAndRecyclerViewAndAdapterTogether(partialMessageString + "Favourite Songs List Selected!");
+                break;
             case R.id.item_sort_by_default:
-                sortMethod = "Default";
+                addSortMethodAndLogMessageAndRecyclerViewAndAdapterTogether(partialMessageString + "Sort by Default Selected!");
                 break;
             case R.id.item_sort_by_artist:
-                sortMethod = "Artist";
                 SortUtility.sortMusicListAscendingByArtist(musicList);
+                addSortMethodAndLogMessageAndRecyclerViewAndAdapterTogether(partialMessageString + "Sort by Artist Selected!");
                 break;
             case R.id.item_sort_by_title:
-                sortMethod = "Title";
                 SortUtility.sortMusicListAscendingBySongTitle(musicList);
+                addSortMethodAndLogMessageAndRecyclerViewAndAdapterTogether(partialMessageString + "Sort by Title Selected!");
                 break;
             default:
                 return super.onOptionsItemSelected(item);
         }
-        Log.i(Constants.LogTags.MUSIC_TAG, "Menu Item - Sort by " + sortMethod + " Selected!");
-        setUpRecyclerViewAndAdapter();
         return true;
+    }
+
+    // Helper method to add methods together to employ modularity (not to repeat code)
+    private void addSortMethodAndLogMessageAndRecyclerViewAndAdapterTogether(String string) {
+        Log.i(Constants.LogTags.MUSIC_TAG, string);
+        setUpRecyclerViewAndAdapter();
     }
 
     @Override

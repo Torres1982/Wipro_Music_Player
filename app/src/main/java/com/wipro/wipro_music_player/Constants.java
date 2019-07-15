@@ -33,8 +33,8 @@ public class Constants {
         int SHUFFLE_SWITCH_STATUS_ON = 1;
         int REPEAT_SWITCH_STATUS_OFF = 0;
         int REPEAT_SWITCH_STATUS_ON = 1;
-        int FAVOURITE_SONG_STATUS_OFF = 0;
-        int FAVOURITE_SONG_STATUS_ON = 1;
+        int SONGS_LIST_STATUS_ALL_SONGS = 0;
+        int SONGS_LIST_STATUS_FAVOURITE_SONGS = 1;
     }
 
     // Holds the Realm Database corresponding Constants

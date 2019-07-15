@@ -56,10 +56,10 @@ public class MusicPlayer extends AppCompatActivity {
     private int songCurrentPosition;
     private int animationScale;
     private List<SongModel> listOfSongs = new ArrayList<>();
-    private String artistNewSong, currentSongArtist;
-    private String titleNewSong, currentSongTitle;
-    private double sizeNewSong, currentSongSize;
-    private long durationNewSong, currentSongLength;
+    private String artistNewSong;
+    private String titleNewSong;
+    private double sizeNewSong;
+    private long durationNewSong;
     private Handler musicHandler = new Handler();
     public static NotificationManager notificationManager;
     private static AudioManager audioManager;
@@ -77,6 +77,7 @@ public class MusicPlayer extends AppCompatActivity {
     private Realm realm;
     private UserSettingsModel userSettingsFromRealmDb;
     private FavouriteSongModel favouriteSongFromRealmDb;
+    private boolean isFavouriteSongsListOn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,12 +143,7 @@ public class MusicPlayer extends AppCompatActivity {
         // Realm DB
         realm = Realm.getDefaultInstance();
         userSettingsFromRealmDb = RealmController.getUserSettingsFromDb(realm);
-
-        // Currently Playing Song details
-        currentSongTitle = listOfSongs.get(songIndex).getTitle();
-        currentSongArtist = listOfSongs.get(songIndex).getArtist();
-        currentSongLength = listOfSongs.get(songIndex).getLength();
-        currentSongSize = listOfSongs.get(songIndex).getSize();
+        isFavouriteSongsListOn = userSettingsFromRealmDb.getSongsListStatus() == Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS;
 
         setUpThemesWithSettingsFromRealmDb();
         setUpSwitchesWithSettingsFromRealmDb();
@@ -230,6 +226,12 @@ public class MusicPlayer extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // Currently Playing Song details
+        String currentSongTitle = listOfSongs.get(songIndex).getTitle();
+        String currentSongArtist = listOfSongs.get(songIndex).getArtist();
+        long currentSongLength = listOfSongs.get(songIndex).getLength();
+        double currentSongSize = listOfSongs.get(songIndex).getSize();
+
         switch (item.getItemId()) {
             case R.id.item_favourites:
                 favouriteSongFromRealmDb = RealmController.checkIfSongIsInRealmDBbySongPath(realm, path);
@@ -689,7 +691,7 @@ public class MusicPlayer extends AppCompatActivity {
 
     // Handles updates for User Settings
     private void updateUserSettings() {
-        int defaultThemeStatus, darkThemeStatus, shuffleSwitchStatus, repeatSwitchStatus;
+        int defaultThemeStatus, darkThemeStatus, shuffleSwitchStatus, repeatSwitchStatus, songsListStatus;
 
         // Manage Themes
         if (isDefaultThemeOn) {
@@ -713,7 +715,14 @@ public class MusicPlayer extends AppCompatActivity {
             repeatSwitchStatus = Constants.UserSettings.REPEAT_SWITCH_STATUS_OFF;
         }
 
-        RealmController.saveUserSettings(realm, defaultThemeStatus, darkThemeStatus, shuffleSwitchStatus, repeatSwitchStatus);
+        // Manage Song Lists
+        if (isFavouriteSongsListOn) {
+            songsListStatus = Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS;
+        } else {
+            songsListStatus = Constants.UserSettings.SONGS_LIST_STATUS_ALL_SONGS;
+        }
+
+        RealmController.saveUserSettings(realm, defaultThemeStatus, darkThemeStatus, shuffleSwitchStatus, repeatSwitchStatus, songsListStatus);
     }
 }
 

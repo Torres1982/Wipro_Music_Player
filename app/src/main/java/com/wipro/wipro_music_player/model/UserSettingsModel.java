@@ -10,6 +10,7 @@ public class UserSettingsModel extends RealmObject {
     private int darkThemeStatus;
     private int shuffleSwitchStatus;
     private int repeatSwitchStatus;
+    private int songsListStatus;
 
     public UserSettingsModel() {}
 
@@ -18,10 +19,12 @@ public class UserSettingsModel extends RealmObject {
     public int getDarkThemeStatus() { return darkThemeStatus; }
     public int getShuffleSwitchStatus() { return shuffleSwitchStatus; }
     public int getRepeatSwitchStatus() { return repeatSwitchStatus; }
+    public int getSongsListStatus() { return songsListStatus; }
 
     public void setId(long id) { this.id = id; }
     public void setDefaultThemeStatus(int defaultThemeStatus) { this.defaultThemeStatus = defaultThemeStatus; }
     public void setDarkThemeStatus(int darkThemeStatus) { this.darkThemeStatus = darkThemeStatus; }
     public void setShuffleSwitchStatus(int shuffleSwitchStatus) { this.shuffleSwitchStatus = shuffleSwitchStatus; }
     public void setRepeatSwitchStatus(int repeatSwitchStatus) { this.repeatSwitchStatus = repeatSwitchStatus; }
+    public void setSongsListStatus(int songsListStatus) { this.songsListStatus = songsListStatus; }
 }

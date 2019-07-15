@@ -5,13 +5,16 @@ import com.wipro.wipro_music_player.Constants;
 import com.wipro.wipro_music_player.model.FavouriteSongModel;
 import com.wipro.wipro_music_player.model.UserSettingsModel;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import io.realm.Realm;
+import io.realm.RealmResults;
 
 public class RealmController {
     // Save the User Settings
-    public static void saveUserSettings(Realm realm, int defaultThemeStatus, int darkThemeStatus, int shuffleSwitchStatus, int repeatSwitchStatus) {
+    public static void saveUserSettings(Realm realm, int defaultThemeStatus, int darkThemeStatus, int shuffleSwitchStatus, int repeatSwitchStatus, int songsListStatus) {
         //realm.executeTransaction(r -> r.delete(UserSettingsModel.class));
         realm.executeTransaction(r -> {
             UserSettingsModel userSettingsRealm = new UserSettingsModel();
@@ -20,6 +23,7 @@ public class RealmController {
             userSettingsRealm.setDarkThemeStatus(darkThemeStatus);
             userSettingsRealm.setShuffleSwitchStatus(shuffleSwitchStatus);
             userSettingsRealm.setRepeatSwitchStatus(repeatSwitchStatus);
+            userSettingsRealm.setSongsListStatus(songsListStatus);
             realm.insertOrUpdate(userSettingsRealm);
         });
         confirmUserSettingsSavedToDb(realm);
@@ -34,7 +38,8 @@ public class RealmController {
                         "\nDefault Theme: " + settings.getDefaultThemeStatus() +
                         "\nDark Theme: " + settings.getDarkThemeStatus() +
                         "\nShuffle Switch: " + settings.getShuffleSwitchStatus() +
-                        "\nRepeat Switch: " + settings.getRepeatSwitchStatus());
+                        "\nRepeat Switch: " + settings.getRepeatSwitchStatus() +
+                        "\nSongs List: " + settings.getSongsListStatus());
     }
 
     // Retrieve User Settings from Realm DB
@@ -58,6 +63,7 @@ public class RealmController {
             favouriteSong.setSongLength(length);
             favouriteSong.setSongSize(size);
             realm.insert(favouriteSong);
+            Log.i(Constants.LogTags.MUSIC_TAG, "Song: " + favouriteSong.getSongTitle() + " - " + favouriteSong.getSongArtist() + " - " + favouriteSong.getSongLength() + " - " + favouriteSong.getSongSize() + " - " + favouriteSong.getSongPath());
         });
     }
 
@@ -83,5 +89,16 @@ public class RealmController {
     // Remove the chosen song from the Favourite Songs list
     public static void removeSongFromFavourites(Realm realm, String path) {
         realm.executeTransaction(r -> Objects.requireNonNull(realm.where(FavouriteSongModel.class).equalTo("songPath", path).findFirst()).deleteFromRealm());
+    }
+
+    // Removing all Favourite Songs from the Db list
+    public static void removeAllSongsFromFavourites(Realm realm) {
+        realm.executeTransaction(r -> realm.where(FavouriteSongModel.class).findAll().deleteAllFromRealm());
+    }
+
+    // Retrieve Favourite Songs list from Realm DB
+    public static List<FavouriteSongModel> getFavouriteSongsFromRealmDb(Realm realm) {
+        RealmResults<FavouriteSongModel> results = realm.where(FavouriteSongModel.class).findAll();
+        return new ArrayList<>(results);
     }
 }
