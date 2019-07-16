@@ -193,17 +193,8 @@ public class MusicPlayer extends AppCompatActivity {
 
     // Switch the Switches on or off when the application starts
     private void activateSwitches() {
-        if (isShuffleSongsSwitchOn) {
-            shuffleSongsSwitch.setChecked(true);
-        } else {
-            shuffleSongsSwitch.setChecked(false);
-        }
-
-        if (isRepeatSongSwitchOn) {
-            repeatSongSwitch.setChecked(true);
-        } else {
-            repeatSongSwitch.setChecked(false);
-        }
+        shuffleSongsSwitch.setChecked(isShuffleSongsSwitchOn);
+        repeatSongSwitch.setChecked(isRepeatSongSwitchOn);
     }
 
     @Override
@@ -217,12 +208,7 @@ public class MusicPlayer extends AppCompatActivity {
         MenuItem settingsItem = menu.findItem(R.id.item_favourites);
         // Check if the Playing song is in the Favourite Songs list in DB, and change the icon accordingly
         favouriteSongFromRealmDb = RealmController.checkIfSongIsInRealmDBbySongPath(realm, path);
-
-        if (favouriteSongFromRealmDb == null) {
-            settingsItem.setIcon(ContextCompat.getDrawable(this, R.drawable.icon_favourite_off));
-        } else {
-            settingsItem.setIcon(ContextCompat.getDrawable(this, R.drawable.icon_favourite_on));
-        }
+        settingsItem.setIcon(favouriteSongFromRealmDb == null ? ContextCompat.getDrawable(this, R.drawable.icon_favourite_off) : ContextCompat.getDrawable(this, R.drawable.icon_favourite_on));
     }
 
     @Override
@@ -359,12 +345,7 @@ public class MusicPlayer extends AppCompatActivity {
         previousSong.setOnClickListener(v -> {
             startViewAnimation(previousSong, animationScale);
             Log.i(Constants.LogTags.MUSIC_TAG, "Switched to Previous Song!");
-
-            if (songIndex == 0) {
-                songIndex = listOfSongs.size() - 1;
-            } else {
-                songIndex = songIndex - 1;
-            }
+            songIndex = songIndex == 0 ? listOfSongs.size() - 1 : songIndex - 1;
             updateToStartNewSong();
         });
     }
@@ -501,11 +482,7 @@ public class MusicPlayer extends AppCompatActivity {
         } else if (isShuffleSongsSwitchOn) {
             songIndex = ConverterUtility.generateRandomSongIndex(listOfSongs.size());
         } else {
-            if (songIndex < listOfSongs.size() - 1) {
-                songIndex = songIndex + 1;
-            } else {
-                songIndex = 0;
-            }
+            songIndex = songIndex < listOfSongs.size() - 1 ? songIndex + 1 : 0;
         }
         updateToStartNewSong();
     }
@@ -714,6 +691,7 @@ public class MusicPlayer extends AppCompatActivity {
         shuffleSwitchStatus = isShuffleSongsSwitchOn ? Constants.UserSettings.SHUFFLE_SWITCH_STATUS_ON : Constants.UserSettings.SHUFFLE_SWITCH_STATUS_OFF;
         repeatSwitchStatus = isRepeatSongSwitchOn ? Constants.UserSettings.REPEAT_SWITCH_STATUS_ON : Constants.UserSettings.REPEAT_SWITCH_STATUS_OFF;
         songsListStatus = isFavouriteSongsListOn ? Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS : Constants.UserSettings.SONGS_LIST_STATUS_ALL_SONGS;
+        // Insert or Update User Settings in the Realm DB
         RealmController.saveUserSettings(realm, defaultThemeStatus, darkThemeStatus, shuffleSwitchStatus, repeatSwitchStatus, songsListStatus);
     }
 }
