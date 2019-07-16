@@ -76,12 +76,7 @@ public class RealmController {
     private static int setFavouriteSongNextUniqueId(Realm realm) {
         int favouriteSongId;
         Number songId = checkTheMaxFavouriteSongIdFromRealmDb(realm);
-
-        if (songId == null) {
-            favouriteSongId = 1;
-        } else {
-            favouriteSongId = songId.intValue() + 1;
-        }
+        favouriteSongId = songId == null ? 1 : songId.intValue() + 1;
         Log.i(Constants.LogTags.MUSIC_TAG, "Next Favourite Song Id is " + favouriteSongId);
         return favouriteSongId;
     }
