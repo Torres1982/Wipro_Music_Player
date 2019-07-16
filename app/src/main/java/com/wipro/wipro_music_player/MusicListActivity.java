@@ -39,8 +39,8 @@ public class MusicListActivity extends AppCompatActivity {
         setContentView(R.layout.songs_list);
 
         PermissionUtility.checkStoragePermissions(getApplicationContext(), this);
-        //RealmController.removeAllSongsFromFavourites(realm);
         realm = Realm.getDefaultInstance();
+        //RealmController.removeAllSongsFromFavourites(realm);
         userSettingsFromRealmDb = RealmController.getUserSettingsFromDb(realm);
         setUpMusicListCheckIfUserSettingsFromRealmDbIsNotEmpty();
         setUpRecyclerViewAndAdapter();
@@ -98,7 +98,7 @@ public class MusicListActivity extends AppCompatActivity {
                 songModel.setLength(duration);
                 songModel.setSize(size);
                 listOfSongs.add(songModel);
-                Log.i(Constants.LogTags.MUSIC_TAG, "ARTIST: " + artist + ". TITLE: " + title + ". LENGTH: " + duration + ". SIZE: " + size + ". PATH: " + path);
+                //Log.i(Constants.LogTags.MUSIC_TAG, "ARTIST: " + artist + ". TITLE: " + title + ". LENGTH: " + duration + ". SIZE: " + size + ". PATH: " + path);
             }
             cursor.close();
         } else {
@@ -121,7 +121,7 @@ public class MusicListActivity extends AppCompatActivity {
                 songModel.setLength(song.getSongLength());
                 songModel.setSize(song.getSongSize());
                 favouriteSongsList.add(songModel);
-                Log.i(Constants.LogTags.MUSIC_TAG, "ARTIST: " + song.getSongArtist() + ". TITLE: " + song.getSongTitle() + ". LENGTH: " + song.getSongLength() + ". SIZE: " + song.getSongSize() + ". PATH: " + song.getSongPath());
+                //Log.i(Constants.LogTags.MUSIC_TAG, "ARTIST: " + song.getSongArtist() + ". TITLE: " + song.getSongTitle() + ". LENGTH: " + song.getSongLength() + ". SIZE: " + song.getSongSize() + ". PATH: " + song.getSongPath());
             }
         } else {
             setUpToastAndLogMessages("Favourite Songs List is Empty!");

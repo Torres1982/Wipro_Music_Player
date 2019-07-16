@@ -16,7 +16,6 @@ public class PlayerApplication extends Application {
         RealmConfiguration config = createDefaultRealmConfiguration();
         Realm.setDefaultConfiguration(config);
         Log.i(Constants.LogTags.MUSIC_TAG, "Realm has been initiated from the Application class!");
-
         getCurrentSchemaVersion(config);
     }
 
@@ -40,7 +39,7 @@ public class PlayerApplication extends Application {
     private static void getCurrentSchemaVersion(RealmConfiguration config) {
         DynamicRealm dynRealm = DynamicRealm.getInstance(config);
         long version = dynRealm.getVersion();
-        Log.i(Constants.LogTags.MUSIC_TAG, "Current Schema Version: " + version);
+        Log.i(Constants.LogTags.MUSIC_TAG, "Current Schema Version: " + version + ". Realm File Name: " + config.getRealmFileName());
         dynRealm.close();
     }
 }

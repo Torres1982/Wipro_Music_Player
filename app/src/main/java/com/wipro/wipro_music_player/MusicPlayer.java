@@ -61,18 +61,18 @@ public class MusicPlayer extends AppCompatActivity {
     private double sizeNewSong;
     private long durationNewSong;
     private Handler musicHandler = new Handler();
-    public static NotificationManager notificationManager;
     private static AudioManager audioManager;
     private static AudioFocusRequest audioFocusRequest;
     private ConstraintLayout constraintLayout;
+    private int greyColour, redColour, yellowColour, lightGreenColour;
     // Notifications
+    public static NotificationManager notificationManager;
     private static ArrayList<String> listOfNotificationActions;
     private static ArrayList<String> listOfNotificationActionTitles;
     private static ArrayList<Integer> listOfDrawableImageButtons;
     private static ArrayList<PendingIntent> listOfNotificationPendingIntents;
     private static ArrayList<NotificationCompat.Action> listOfNotificationActionBuilders;
     private boolean isDefaultThemeOn, isDarkThemeOn;
-    private int greyColour, redColour, yellowColour, lightGreenColour;
     // Realm DB
     private Realm realm;
     private UserSettingsModel userSettingsFromRealmDb;
@@ -143,14 +143,7 @@ public class MusicPlayer extends AppCompatActivity {
         // Realm DB
         realm = Realm.getDefaultInstance();
         userSettingsFromRealmDb = RealmController.getUserSettingsFromDb(realm);
-
-        if (userSettingsFromRealmDb != null) {
-            isFavouriteSongsListOn = userSettingsFromRealmDb.getSongsListStatus() == Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS;
-            setUpThemesWithSettingsFromRealmDb();
-            setUpSwitchesWithSettingsFromRealmDb();
-        } else {
-            isFavouriteSongsListOn = false;
-        }
+        initialConfigurationOfUserSettingsFromRealmDb();
 
         startViewAnimation(footer, animationTranslate);
         updateViewDetails(artist, title, size, length);
@@ -165,6 +158,17 @@ public class MusicPlayer extends AppCompatActivity {
         showActionBarNotification();
         controlAudioFocus();
         startPlaying(path);
+    }
+
+    // Initial Configuration of User Settings retrieved from the Realm DB
+    private void initialConfigurationOfUserSettingsFromRealmDb() {
+        if (userSettingsFromRealmDb != null) {
+            isFavouriteSongsListOn = userSettingsFromRealmDb.getSongsListStatus() == Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS;
+            setUpThemesWithSettingsFromRealmDb();
+            setUpSwitchesWithSettingsFromRealmDb();
+        } else {
+            isFavouriteSongsListOn = false;
+        }
     }
 
     // Initial Set Up of Theme according to the settings gathered from Realm DB
@@ -245,26 +249,26 @@ public class MusicPlayer extends AppCompatActivity {
                 if (favouriteSongFromRealmDb == null) {
                     RealmController.addSongToFavourites(realm, currentSongTitle, currentSongArtist, path, currentSongLength, currentSongSize);
                     item.setIcon(R.drawable.icon_favourite_on);
-                    Log.i(Constants.LogTags.MUSIC_TAG, "No Song found! Added To Favourites! " + path);
+                    Log.i(Constants.LogTags.MUSIC_TAG, "Song Added To Favourites: " + path);
                 } else {
                     RealmController.removeSongFromFavourites(realm, path);
                     item.setIcon(R.drawable.icon_favourite_off);
-                    Log.i(Constants.LogTags.MUSIC_TAG, "Song Found! Removed from Favourites! " + path);
+                    Log.i(Constants.LogTags.MUSIC_TAG, "Song Removed from Favourites: " + path);
                 }
                 break;
             case R.id.item_default_theme:
                 updateDefaultThemeMenuItemOption();
-                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Default Theme selected!");
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Default Theme Selected!");
                 break;
             case R.id.item_dark_theme:
                 updateDarkThemeMenuItemOption();
-                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Dark Theme selected!");
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Dark Theme Selected!");
                 break;
             case R.id.item_tags:
-                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Update Tags selected!");
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu Update Tags Selected!");
                 break;
             case R.id.item_about:
-                Log.i(Constants.LogTags.MUSIC_TAG, "Menu About selected!");
+                Log.i(Constants.LogTags.MUSIC_TAG, "Menu About Selected!");
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -512,7 +516,7 @@ public class MusicPlayer extends AppCompatActivity {
         updateViewDetails(artistNewSong, titleNewSong, sizeNewSong, durationNewSong);
         startPlaying(path);
         showActionBarNotification();
-        Log.i(Constants.LogTags.MUSIC_TAG, "Artist: " + artistNewSong + ". New Song Index: " + songIndex);
+        Log.i(Constants.LogTags.MUSIC_TAG, songIndex + " : " + artistNewSong + " - " + titleNewSong + ".");
     }
 
     // Set the On Completion Media Player Listener
@@ -720,7 +724,7 @@ public class MusicPlayer extends AppCompatActivity {
             repeatSwitchStatus = Constants.UserSettings.REPEAT_SWITCH_STATUS_OFF;
         }
 
-        // Manage Song Lists
+        // Manage Song Lists TODO Clean the code and split into smaller methods
 //        if (userSettingsFromRealmDb != null) {
 //            songsListStatus = userSettingsFromRealmDb.getSongsListStatus();
 //            isFavouriteSongsListOn = songsListStatus == Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS;
