@@ -711,46 +711,10 @@ public class MusicPlayer extends AppCompatActivity {
             darkThemeStatus = Constants.UserSettings.DARK_THEME_STATUS_ON;
         }
 
-        shuffleSwitchStatus = updateShuffleSongsSwitchStatus();
-        repeatSwitchStatus = updateRepeatSongSwitchStatus();
-        songsListStatus = updateSongsListStatus();
+        shuffleSwitchStatus = isShuffleSongsSwitchOn ? Constants.UserSettings.SHUFFLE_SWITCH_STATUS_ON : Constants.UserSettings.SHUFFLE_SWITCH_STATUS_OFF;
+        repeatSwitchStatus = isRepeatSongSwitchOn ? Constants.UserSettings.REPEAT_SWITCH_STATUS_ON : Constants.UserSettings.REPEAT_SWITCH_STATUS_OFF;
+        songsListStatus = isFavouriteSongsListOn ? Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS : Constants.UserSettings.SONGS_LIST_STATUS_ALL_SONGS;
         RealmController.saveUserSettings(realm, defaultThemeStatus, darkThemeStatus, shuffleSwitchStatus, repeatSwitchStatus, songsListStatus);
-    }
-
-    // Update the Shuffle Songs Switch Status
-    private int updateShuffleSongsSwitchStatus() {
-        int shuffleSwitchStatus;
-
-        if (isShuffleSongsSwitchOn) {
-            shuffleSwitchStatus = Constants.UserSettings.SHUFFLE_SWITCH_STATUS_ON;
-        } else {
-            shuffleSwitchStatus = Constants.UserSettings.SHUFFLE_SWITCH_STATUS_OFF;
-        }
-        return shuffleSwitchStatus;
-    }
-
-    // Update the Repeat Song Switch Status
-    private int updateRepeatSongSwitchStatus() {
-        int repeatSwitchStatus;
-
-        if (isRepeatSongSwitchOn) {
-            repeatSwitchStatus = Constants.UserSettings.REPEAT_SWITCH_STATUS_ON;
-        } else {
-            repeatSwitchStatus = Constants.UserSettings.REPEAT_SWITCH_STATUS_OFF;
-        }
-        return repeatSwitchStatus;
-    }
-
-    // Update the Songs List Status
-    private int updateSongsListStatus() {
-        int songsListStatus;
-
-        if (isFavouriteSongsListOn) {
-            songsListStatus = Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS;
-        } else {
-            songsListStatus = Constants.UserSettings.SONGS_LIST_STATUS_ALL_SONGS;
-        }
-        return songsListStatus;
     }
 }
 
