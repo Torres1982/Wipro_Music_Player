@@ -495,6 +495,7 @@ public class MusicPlayer extends AppCompatActivity {
     private void updateToStartNewSong() {
         loadNewSongOnNextOrPreviousButtonClick();
         updateViewDetails(artistNewSong, titleNewSong, sizeNewSong, durationNewSong);
+        MusicTagger.getAlbumCoverFromId3v2Tag(songAlbumCover, path);
         startPlaying(path);
         showActionBarNotification();
         Log.i(Constants.LogTags.MUSIC_TAG, songIndex + " : " + artistNewSong + " - " + titleNewSong + ".");

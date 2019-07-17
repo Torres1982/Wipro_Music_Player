@@ -17,8 +17,6 @@ class MusicTagger {
 
     // Convert bytes array to the Image and set the Album Cover for the given song path
     static void getAlbumCoverFromId3v2Tag(ImageView imageView, String mp3path) {
-        Log.i(Constants.LogTags.MUSIC_TAG, "Music Tagger Loaded!");
-
         try {
             song = new Mp3File(mp3path);
         } catch (IOException | UnsupportedTagException | InvalidDataException e) {
@@ -26,17 +24,19 @@ class MusicTagger {
         }
 
         if (song != null && song.hasId3v2Tag()) {
-            Log.i(Constants.LogTags.MUSIC_TAG, "Song Is Not Null and Has ID3 Tag!");
             ID3v2 id3v2tag = song.getId3v2Tag();
             byte [] imageData = id3v2tag.getAlbumImage();
 
             if (imageData != null) {
                 Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
                 imageView.setImageBitmap(bitmap);
+                Log.i(Constants.LogTags.MUSIC_TAG, "Song Album Image Loaded from the ID3 Tag!");
             } else {
                 imageView.setImageResource(R.drawable.music);
+                Log.i(Constants.LogTags.MUSIC_TAG, "Default Song Album Image Loaded!");
             }
         } else {
+            imageView.setImageResource(R.drawable.music);
             Log.i(Constants.LogTags.MUSIC_TAG, "Song Cannot Be Found or It Has No ID3 Tag!");
         }
     }
