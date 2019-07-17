@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -46,6 +47,7 @@ import io.realm.Realm;
 
 public class MusicPlayer extends AppCompatActivity {
     private TextView songTitle, songArtist, songSize, songLength, songTimeElapsed, footer;
+    private ImageView songAlbumCover;
     private ImageButton playSong, stopSong, nextSong, previousSong;
     private SeekBar seekBar;
     private Switch shuffleSongsSwitch, repeatSongSwitch;
@@ -97,6 +99,7 @@ public class MusicPlayer extends AppCompatActivity {
         listOfSongs = MusicListActivity.musicList;
         mediaPlayer = new MediaPlayer();
 
+        songAlbumCover = findViewById(R.id.music_main_image);
         songArtist = findViewById(R.id.music_artist);
         songTitle = findViewById(R.id.music_title);
         songSize = findViewById(R.id.music_size);
@@ -158,6 +161,7 @@ public class MusicPlayer extends AppCompatActivity {
         showActionBarNotification();
         controlAudioFocus();
         startPlaying(path);
+        MusicTagger.getAlbumCoverFromId3v2Tag(songAlbumCover, path);
     }
 
     // Initial Configuration of User Settings retrieved from the Realm DB

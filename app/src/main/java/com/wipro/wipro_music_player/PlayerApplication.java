@@ -21,13 +21,8 @@ public class PlayerApplication extends Application {
 
     // Set up the Default Realm Configuration for the Application
     private static RealmConfiguration createDefaultRealmConfiguration() {
-        // Generate the random Encryption Key
-//        byte [] encryptionKey = new byte [64];
-//        new SecureRandom().nextBytes(encryptionKey);
-
         RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
                 .name(Constants.RealmDB.DEFAULT_REALM_CONFIGURATION_NAME)
-//                .encryptionKey(encryptionKey)
                 .schemaVersion(1)
                 .deleteRealmIfMigrationNeeded()
                 .build();
