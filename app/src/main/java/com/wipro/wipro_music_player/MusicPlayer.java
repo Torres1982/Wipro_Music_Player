@@ -146,7 +146,7 @@ public class MusicPlayer extends AppCompatActivity {
         // Realm DB
         realm = Realm.getDefaultInstance();
         userSettingsFromRealmDb = RealmController.getUserSettingsFromDb(realm);
-        initialConfigurationOfUserSettingsFromRealmDb();
+        initialConfigurationOfUserSettingsFromRealmDb(userSettingsFromRealmDb);
 
         startViewAnimation(footer, animationTranslate);
         updateViewDetails(artist, title, size, length);
@@ -165,9 +165,11 @@ public class MusicPlayer extends AppCompatActivity {
     }
 
     // Initial Configuration of User Settings retrieved from the Realm DB
-    private void initialConfigurationOfUserSettingsFromRealmDb() {
-        if (userSettingsFromRealmDb != null) {
-            isFavouriteSongsListOn = userSettingsFromRealmDb.getSongsListStatus() == Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS;
+    private void initialConfigurationOfUserSettingsFromRealmDb(UserSettingsModel settings) {
+        if (settings != null) {
+            isFavouriteSongsListOn = settings.getSongsListStatus() == Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS;
+            isShuffleSongsSwitchOn = settings.getShuffleSwitchStatus() == Constants.UserSettings.SHUFFLE_SWITCH_STATUS_ON;
+            isRepeatSongSwitchOn = settings.getRepeatSwitchStatus() == Constants.UserSettings.REPEAT_SWITCH_STATUS_ON;
             setUpThemesWithSettingsFromRealmDb();
             setUpSwitchesWithSettingsFromRealmDb();
         } else {
