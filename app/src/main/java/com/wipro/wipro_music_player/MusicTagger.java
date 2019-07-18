@@ -1,5 +1,6 @@
 package com.wipro.wipro_music_player;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -16,7 +17,7 @@ class MusicTagger {
     private static Mp3File song = null;
 
     // Convert bytes array to the Image and set the Album Cover for the given song path
-    static void getAlbumCoverFromId3v2Tag(ImageView imageView, String mp3path) {
+    static void setAlbumCoverFromId3v2Tag(Context context, ImageView imageView, String mp3path) {
         try {
             song = new Mp3File(mp3path);
         } catch (IOException | UnsupportedTagException | InvalidDataException e) {
@@ -28,16 +29,21 @@ class MusicTagger {
             byte [] imageData = id3v2tag.getAlbumImage();
 
             if (imageData != null) {
-                Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
-                imageView.setImageBitmap(bitmap);
+                Bitmap bitmapAlbumCover = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+                imageView.setImageBitmap(bitmapAlbumCover);
                 Log.i(Constants.LogTags.MUSIC_TAG, "Song Album Image Loaded from the ID3 Tag!");
             } else {
-                imageView.setImageResource(R.drawable.music);
-                Log.i(Constants.LogTags.MUSIC_TAG, "Default Song Album Image Loaded!");
+                setUpDefaultBitmapAlbumCover(context, imageView, "Default Song Album Image Loaded!");
             }
         } else {
-            imageView.setImageResource(R.drawable.music);
-            Log.i(Constants.LogTags.MUSIC_TAG, "Song Cannot Be Found or It Has No ID3 Tag!");
+            setUpDefaultBitmapAlbumCover(context, imageView, "Song Cannot Be Found or It Has No ID3 Tag!");
         }
+    }
+
+    // Set the Default Bitmap Album Cover
+    private static void setUpDefaultBitmapAlbumCover(Context context, ImageView imageView, String message) {
+        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.music);
+        imageView.setImageBitmap(bitmap);
+        Log.i(Constants.LogTags.MUSIC_TAG, message);
     }
 }

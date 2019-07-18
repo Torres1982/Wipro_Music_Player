@@ -161,7 +161,7 @@ public class MusicPlayer extends AppCompatActivity {
         showActionBarNotification();
         controlAudioFocus();
         startPlaying(path);
-        MusicTagger.getAlbumCoverFromId3v2Tag(songAlbumCover, path);
+        MusicTagger.setAlbumCoverFromId3v2Tag(this, songAlbumCover, path);
     }
 
     // Initial Configuration of User Settings retrieved from the Realm DB
@@ -495,7 +495,7 @@ public class MusicPlayer extends AppCompatActivity {
     private void updateToStartNewSong() {
         loadNewSongOnNextOrPreviousButtonClick();
         updateViewDetails(artistNewSong, titleNewSong, sizeNewSong, durationNewSong);
-        MusicTagger.getAlbumCoverFromId3v2Tag(songAlbumCover, path);
+        MusicTagger.setAlbumCoverFromId3v2Tag(this, songAlbumCover, path);
         startPlaying(path);
         showActionBarNotification();
         Log.i(Constants.LogTags.MUSIC_TAG, songIndex + " : " + artistNewSong + " - " + titleNewSong + ".");

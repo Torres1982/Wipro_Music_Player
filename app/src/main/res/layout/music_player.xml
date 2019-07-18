@@ -57,7 +57,6 @@
         android:layout_marginStart="@dimen/margin_sixty"
         android:layout_marginTop="@dimen/margin_twenty"
         android:layout_marginEnd="@dimen/margin_sixty"
-        android:background="@drawable/music"
         android:contentDescription="@string/icon_description"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
