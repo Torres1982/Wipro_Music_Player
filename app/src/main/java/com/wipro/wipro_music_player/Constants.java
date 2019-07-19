@@ -35,6 +35,9 @@ public class Constants {
         int REPEAT_SWITCH_STATUS_ON = 1;
         int SONGS_LIST_STATUS_ALL_SONGS = 0;
         int SONGS_LIST_STATUS_FAVOURITE_SONGS = 1;
+        int SORT_LIST_BY_DEFAULT = 0;
+        int SORT_LIST_BY_ARTIST = 1;
+        int SORT_LIST_BY_TITLE = 2;
     }
 
     // Holds the Realm Database corresponding Constants

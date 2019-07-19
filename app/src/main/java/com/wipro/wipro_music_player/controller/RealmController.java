@@ -14,7 +14,7 @@ import io.realm.RealmResults;
 
 public class RealmController {
     // Save the User Settings
-    public static void saveUserSettings(Realm realm, int defaultThemeStatus, int darkThemeStatus, int shuffleSwitchStatus, int repeatSwitchStatus, int songsListStatus) {
+    public static void saveUserSettings(Realm realm, int defaultThemeStatus, int darkThemeStatus, int shuffleSwitchStatus, int repeatSwitchStatus, int songsListStatus, int sortingListStatus) {
         //realm.executeTransaction(r -> r.delete(UserSettingsModel.class));
         realm.executeTransaction(r -> {
             UserSettingsModel userSettingsRealm = new UserSettingsModel();
@@ -24,6 +24,7 @@ public class RealmController {
             userSettingsRealm.setShuffleSwitchStatus(shuffleSwitchStatus);
             userSettingsRealm.setRepeatSwitchStatus(repeatSwitchStatus);
             userSettingsRealm.setSongsListStatus(songsListStatus);
+            userSettingsRealm.setSortingListStatus(sortingListStatus);
             realm.insertOrUpdate(userSettingsRealm);
         });
         confirmUserSettingsSavedToDb(realm);
@@ -39,7 +40,8 @@ public class RealmController {
                         "\nDark Theme: " + settings.getDarkThemeStatus() +
                         "\nShuffle Switch: " + settings.getShuffleSwitchStatus() +
                         "\nRepeat Switch: " + settings.getRepeatSwitchStatus() +
-                        "\nSongs List: " + settings.getSongsListStatus());
+                        "\nSongs List: " + settings.getSongsListStatus() +
+                        "\nSort List: " + settings.getSortingListStatus());
     }
 
     // Retrieve User Settings from Realm DB
@@ -102,6 +104,14 @@ public class RealmController {
         realm.executeTransaction(r -> {
             UserSettingsModel settings = getUserSettingsFromDb(realm);
             settings.setSongsListStatus(songStatus);
+        });
+    }
+
+    // Update the Sorting List Status
+    public static void updateUserSettingsSortingListStatus(Realm realm, int sortingList) {
+        realm.executeTransaction(r -> {
+            UserSettingsModel settings = getUserSettingsFromDb(realm);
+            settings.setSortingListStatus(sortingList);
         });
     }
 }

@@ -80,6 +80,7 @@ public class MusicPlayer extends AppCompatActivity {
     private UserSettingsModel userSettingsFromRealmDb;
     private FavouriteSongModel favouriteSongFromRealmDb;
     private boolean isFavouriteSongsListOn;
+    private int sortListStatus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,6 +171,7 @@ public class MusicPlayer extends AppCompatActivity {
             isFavouriteSongsListOn = settings.getSongsListStatus() == Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS;
             isShuffleSongsSwitchOn = settings.getShuffleSwitchStatus() == Constants.UserSettings.SHUFFLE_SWITCH_STATUS_ON;
             isRepeatSongSwitchOn = settings.getRepeatSwitchStatus() == Constants.UserSettings.REPEAT_SWITCH_STATUS_ON;
+            sortListStatus = settings.getSortingListStatus();
             setUpThemesWithSettingsFromRealmDb();
             setUpSwitchesWithSettingsFromRealmDb();
         } else {
@@ -699,7 +701,7 @@ public class MusicPlayer extends AppCompatActivity {
         repeatSwitchStatus = isRepeatSongSwitchOn ? Constants.UserSettings.REPEAT_SWITCH_STATUS_ON : Constants.UserSettings.REPEAT_SWITCH_STATUS_OFF;
         songsListStatus = isFavouriteSongsListOn ? Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS : Constants.UserSettings.SONGS_LIST_STATUS_ALL_SONGS;
         // Insert or Update User Settings in the Realm DB
-        RealmController.saveUserSettings(realm, defaultThemeStatus, darkThemeStatus, shuffleSwitchStatus, repeatSwitchStatus, songsListStatus);
+        RealmController.saveUserSettings(realm, defaultThemeStatus, darkThemeStatus, shuffleSwitchStatus, repeatSwitchStatus, songsListStatus, sortListStatus);
     }
 }
 

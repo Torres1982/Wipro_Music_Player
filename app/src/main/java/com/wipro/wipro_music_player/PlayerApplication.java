@@ -23,7 +23,7 @@ public class PlayerApplication extends Application {
     private static RealmConfiguration createDefaultRealmConfiguration() {
         RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
                 .name(Constants.RealmDB.DEFAULT_REALM_CONFIGURATION_NAME)
-                .schemaVersion(1)
+                .schemaVersion(2)
                 .deleteRealmIfMigrationNeeded()
                 .build();
         Realm.setDefaultConfiguration(realmConfiguration);

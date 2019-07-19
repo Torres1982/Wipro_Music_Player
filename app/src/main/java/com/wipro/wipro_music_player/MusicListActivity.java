@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 public class MusicListActivity extends AppCompatActivity {
     static List<SongModel> musicList;
@@ -43,6 +44,7 @@ public class MusicListActivity extends AppCompatActivity {
         //RealmController.removeAllSongsFromFavourites(realm);
         userSettingsFromRealmDb = RealmController.getUserSettingsFromDb(realm);
         setUpMusicListCheckIfUserSettingsFromRealmDbIsNotEmpty();
+        setUpSortingListBySortingListStatusFromRealmDb();
         setUpRecyclerViewAndAdapter();
     }
 
@@ -63,6 +65,19 @@ public class MusicListActivity extends AppCompatActivity {
             musicList = getAllAudioFromDevice(this);
         } else if (defaultSongListFromDb == Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS) {
             musicList = getListOfFavouriteSongsFromRealmDb();
+        }
+    }
+
+    // Initial Set Up to handle the List Sorting by given Status
+    private void setUpSortingListBySortingListStatusFromRealmDb() {
+        if (userSettingsFromRealmDb != null) {
+            int sortingListStatus = userSettingsFromRealmDb.getSortingListStatus();
+
+            if (sortingListStatus == Constants.UserSettings.SORT_LIST_BY_ARTIST) {
+                SortUtility.sortMusicListAscendingByArtist(musicList);
+            } else if (sortingListStatus == Constants.UserSettings.SORT_LIST_BY_TITLE) {
+                SortUtility.sortMusicListAscendingBySongTitle(musicList);
+            }
         }
     }
 
@@ -179,23 +194,28 @@ public class MusicListActivity extends AppCompatActivity {
                 musicList = getAllAudioFromDevice(this);
                 messageString = "Menu Item - All Songs List Selected!";
                 RealmController.updateUserSettingsSongListStatus(realm, Constants.UserSettings.SONGS_LIST_STATUS_ALL_SONGS);
+                setUpSortingListBySortingListStatusFromRealmDb();
                 break;
             case R.id.item_select_favourite_songs_list:
                 musicList = getListOfFavouriteSongsFromRealmDb();
                 messageString = "Menu Item - Favourite Songs List Selected!";
                 RealmController.updateUserSettingsSongListStatus(realm, Constants.UserSettings.SONGS_LIST_STATUS_FAVOURITE_SONGS);
+                setUpSortingListBySortingListStatusFromRealmDb();
                 break;
             case R.id.item_sort_by_default:
                 setUpMusicListCheckIfUserSettingsFromRealmDbIsNotEmpty();
                 messageString = "Menu Item - Sort by Default Selected!";
+                RealmController.updateUserSettingsSortingListStatus(realm, Constants.UserSettings.SORT_LIST_BY_DEFAULT);
                 break;
             case R.id.item_sort_by_artist:
                 SortUtility.sortMusicListAscendingByArtist(musicList);
                 messageString = "Menu Item - Sort by Artist Selected!";
+                RealmController.updateUserSettingsSortingListStatus(realm, Constants.UserSettings.SORT_LIST_BY_ARTIST);
                 break;
             case R.id.item_sort_by_title:
                 SortUtility.sortMusicListAscendingBySongTitle(musicList);
                 messageString = "Menu Item - Sort by Title Selected!";
+                RealmController.updateUserSettingsSortingListStatus(realm, Constants.UserSettings.SORT_LIST_BY_TITLE);
                 break;
             default:
                 return super.onOptionsItemSelected(item);
