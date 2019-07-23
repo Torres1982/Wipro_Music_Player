@@ -24,9 +24,6 @@ public class MusicReceiver extends BroadcastReceiver {
             default:
                 Log.i(Constants.LogTags.MUSIC_TAG, "Default Broadcast Receiver Action!");
         }
-
-        //Intent closeNotificationTrayIntent = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-        //context.sendBroadcast(closeNotificationTrayIntent);
     }
 
     public static void performActionPreviousSong() {

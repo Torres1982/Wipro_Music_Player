@@ -54,12 +54,9 @@ public class MusicPlayer extends AppCompatActivity {
     private boolean isShuffleSongsSwitchOn, isRepeatSongSwitchOn;
     private MediaPlayer mediaPlayer;
     private String path;
-    private int songIndex;
-    private int songCurrentPosition;
-    private int animationScale;
+    private int songIndex, songCurrentPosition, animationScale;
     private List<SongModel> listOfSongs = new ArrayList<>();
-    private String artistNewSong;
-    private String titleNewSong;
+    private String artistNewSong, titleNewSong;
     private double sizeNewSong;
     private long durationNewSong;
     private Handler musicHandler = new Handler();
@@ -619,7 +616,6 @@ public class MusicPlayer extends AppCompatActivity {
                 .setTicker(songTitle)
                 .setOnlyAlertOnce(true)
                 .setOngoing(true);
-        //.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
         Notification notification = notificationBuilder.build();
         notificationManager.notify(Constants.NotificationIdentifier.NOTIFICATION_ID, notification);
     }
@@ -704,10 +700,3 @@ public class MusicPlayer extends AppCompatActivity {
         RealmController.saveUserSettings(realm, defaultThemeStatus, darkThemeStatus, shuffleSwitchStatus, repeatSwitchStatus, songsListStatus, sortListStatus);
     }
 }
-
-// TODO Maybe it needs to be implemented later in showActionBarNotification method
-//RemoteViews notificationCompact = new RemoteViews(getPackageName(), R.layout.notification_compact);
-//RemoteViews notificationExpanded = new RemoteViews(getPackageName(), R.layout.notification_expanded);
-//notificationCompact.setOnClickPendingIntent(R.id.button_previous, pendingPreviousIntent);
-//.setCustomContentView(notificationCompact)
-//.setCustomBigContentView(notificationExpanded)
