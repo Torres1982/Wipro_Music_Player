@@ -3,6 +3,7 @@ package com.wipro.wipro_music_player;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -10,11 +11,42 @@ import com.mpatric.mp3agic.ID3v2;
 import com.mpatric.mp3agic.InvalidDataException;
 import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
+import com.wipro.wipro_music_player.model.AlbumCover;
+import com.wipro.wipro_music_player.util.RetrofitUtility;
 
 import java.io.IOException;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 class MusicTagger {
     private static Mp3File song = null;
+    private static String imageUrl;
+
+    // Handles downloads of Images from the Internet using Retrofit 2.0 API
+    public static void fetchAlbumCoverFromInternet() {
+        Call<AlbumCover> serviceCall = RetrofitUtility.getRetrofitServiceCall().getAlbumCover(35);
+
+        serviceCall.enqueue(new Callback<AlbumCover>() {
+            @Override
+            public void onResponse(@NonNull Call<AlbumCover> call, @NonNull Response<AlbumCover> response) {
+                if (response.isSuccessful()) {
+                    assert response.body() != null;
+                    imageUrl = response.body().getThumbnailUrl();
+                    Log.i(Constants.LogTags.MUSIC_TAG, "Responded SUCCESS with a Status Code " + response.code() + " " + imageUrl);
+                } else {
+                    Log.i(Constants.LogTags.MUSIC_TAG, "Responded FAIL with a Status Code " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<AlbumCover> call, @NonNull Throwable t) {
+                //Log.i(Constants.LogTags.MUSIC_TAG, t.getMessage());
+                Log.i(Constants.LogTags.MUSIC_TAG, "Responded FATAL ERROR!");
+            }
+        });
+    }
 
     // Convert bytes array to the Image and set the Album Cover for the given song path
     static void setAlbumCoverFromId3v2Tag(Context context, ImageView imageView, String mp3path) {
@@ -23,6 +55,8 @@ class MusicTagger {
         } catch (IOException | UnsupportedTagException | InvalidDataException e) {
             Log.i(Constants.LogTags.MUSIC_TAG, "Exception Occurred While Reading The mp3 File!");
         }
+
+        fetchAlbumCoverFromInternet();
 
         if (song != null && song.hasId3v2Tag()) {
             ID3v2 id3v2tag = song.getId3v2Tag();
