@@ -3,6 +3,7 @@ package com.wipro.wipro_music_player;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.ImageView;
@@ -15,6 +16,10 @@ import com.wipro.wipro_music_player.model.AlbumCover;
 import com.wipro.wipro_music_player.util.RetrofitUtility;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -22,19 +27,52 @@ import retrofit2.Response;
 
 class MusicTagger {
     private static Mp3File song = null;
-    private static String imageUrl;
+    private static String imageStringUrl;
 
-    // Handles downloads of Images from the Internet using Retrofit 2.0 API
-    public static void fetchAlbumCoverFromInternet() {
-        Call<AlbumCover> serviceCall = RetrofitUtility.getRetrofitServiceCall().getAlbumCover(35);
+    private static class ImageDownloader extends AsyncTask<String, Void, Bitmap> {
+        private final WeakReference<ImageView> imageView;
+
+        ImageDownloader(ImageView imageView) {
+            this.imageView = new WeakReference<>(imageView);
+        }
+
+        @Override
+        protected Bitmap doInBackground(String... strings) {
+            try {
+                URL url = new URL(strings[0]);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                InputStream input = connection.getInputStream();
+                Log.i(Constants.LogTags.MUSIC_TAG, "Input Stream Connection SUCCESS!");
+                return BitmapFactory.decodeStream(input);
+            } catch (IOException e) {
+                Log.i(Constants.LogTags.MUSIC_TAG, "I/O Exception while opening Stream Connection!");
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+
+            if (imageView.get() != null) {
+                imageView.get().setImageBitmap(bitmap);
+            }
+        }
+    }
+
+    // Handles downloads of Image URL from the Internet using Retrofit 2.0 API
+    private static void fetchAlbumCoverFromInternet(int albumCoverId) {
+        Call<AlbumCover> serviceCall = RetrofitUtility.getRetrofitServiceCall().getAlbumCover(albumCoverId);
 
         serviceCall.enqueue(new Callback<AlbumCover>() {
             @Override
             public void onResponse(@NonNull Call<AlbumCover> call, @NonNull Response<AlbumCover> response) {
                 if (response.isSuccessful()) {
                     assert response.body() != null;
-                    imageUrl = response.body().getThumbnailUrl();
-                    Log.i(Constants.LogTags.MUSIC_TAG, "Responded SUCCESS with a Status Code " + response.code() + " " + imageUrl);
+                    imageStringUrl = response.body().getThumbnailUrl();
+                    Log.i(Constants.LogTags.MUSIC_TAG, "Responded SUCCESS with a Status Code " + response.code() + " " + imageStringUrl);
                 } else {
                     Log.i(Constants.LogTags.MUSIC_TAG, "Responded FAIL with a Status Code " + response.code());
                 }
@@ -42,8 +80,7 @@ class MusicTagger {
 
             @Override
             public void onFailure(@NonNull Call<AlbumCover> call, @NonNull Throwable t) {
-                //Log.i(Constants.LogTags.MUSIC_TAG, t.getMessage());
-                Log.i(Constants.LogTags.MUSIC_TAG, "Responded FATAL ERROR!");
+                Log.i(Constants.LogTags.MUSIC_TAG, "Responded FATAL ERROR - on Failure!");
             }
         });
     }
@@ -56,7 +93,7 @@ class MusicTagger {
             Log.i(Constants.LogTags.MUSIC_TAG, "Exception Occurred While Reading The mp3 File!");
         }
 
-        fetchAlbumCoverFromInternet();
+        fetchAlbumCoverFromInternet(35);
 
         if (song != null && song.hasId3v2Tag()) {
             ID3v2 id3v2tag = song.getId3v2Tag();
@@ -67,7 +104,8 @@ class MusicTagger {
                 imageView.setImageBitmap(bitmapAlbumCover);
                 Log.i(Constants.LogTags.MUSIC_TAG, "Song Album Image Loaded from the ID3v2 Tag!");
             } else {
-                setUpDefaultBitmapAlbumCover(context, imageView, "Default Song Album Image Loaded!");
+                //setUpDefaultBitmapAlbumCover(context, imageView, "Default Song Album Image Loaded!");
+                new ImageDownloader(imageView).execute(imageStringUrl); // Used by Async Task
             }
             getID3v2TagInformation();
         } else {

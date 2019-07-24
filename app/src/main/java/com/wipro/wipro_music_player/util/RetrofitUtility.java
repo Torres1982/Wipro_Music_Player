@@ -1,6 +1,14 @@
 package com.wipro.wipro_music_player.util;
 
+import android.app.DownloadManager;
+
 import com.wipro.wipro_music_player.RetrofitInterface;
+
+import java.io.IOException;
+
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
