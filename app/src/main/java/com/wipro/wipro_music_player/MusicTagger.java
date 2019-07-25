@@ -14,6 +14,7 @@ import com.mpatric.mp3agic.Mp3File;
 import com.mpatric.mp3agic.UnsupportedTagException;
 import com.wipro.wipro_music_player.model.AlbumCover;
 import com.wipro.wipro_music_player.util.RetrofitUtility;
+import com.wipro.wipro_music_player.util.SortUtility;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,7 +64,7 @@ class MusicTagger {
     }
 
     // Handles downloads of Image URL from the Internet using Retrofit 2.0 API
-    private static void fetchAlbumCoverFromInternet(int albumCoverId) {
+    private static String fetchAlbumCoverFromInternet(int albumCoverId) {
         Call<AlbumCover> serviceCall = RetrofitUtility.getRetrofitServiceCall().getAlbumCover(albumCoverId);
 
         serviceCall.enqueue(new Callback<AlbumCover>() {
@@ -83,6 +84,7 @@ class MusicTagger {
                 Log.i(Constants.LogTags.MUSIC_TAG, "Responded FATAL ERROR - on Failure!");
             }
         });
+        return imageStringUrl;
     }
 
     // Convert bytes array to the Image and set the Album Cover for the given song path
@@ -93,7 +95,8 @@ class MusicTagger {
             Log.i(Constants.LogTags.MUSIC_TAG, "Exception Occurred While Reading The mp3 File!");
         }
 
-        fetchAlbumCoverFromInternet(35);
+        imageStringUrl = fetchAlbumCoverFromInternet(SortUtility.getRandomIntegerBetweenMinAndMaxValuesRange(1, 5000));
+        Log.i(Constants.LogTags.MUSIC_TAG, "Image String URL: " + imageStringUrl);
 
         if (song != null && song.hasId3v2Tag()) {
             ID3v2 id3v2tag = song.getId3v2Tag();
@@ -104,12 +107,16 @@ class MusicTagger {
                 imageView.setImageBitmap(bitmapAlbumCover);
                 Log.i(Constants.LogTags.MUSIC_TAG, "Song Album Image Loaded from the ID3v2 Tag!");
             } else {
-                //setUpDefaultBitmapAlbumCover(context, imageView, "Default Song Album Image Loaded!");
-                new ImageDownloader(imageView).execute(imageStringUrl); // Used by Async Task
+                setUpDefaultBitmapAlbumCover(context, imageView, "Default Song Album Image Loaded!");
+                //new ImageDownloader(imageView).execute(imageStringUrl); // Used by Async Task
+                //fetchAlbumCoverFromInternet(SortUtility.getRandomIntegerBetweenMinAndMaxValuesPassed(1, 5000));
             }
             getID3v2TagInformation();
         } else {
-            setUpDefaultBitmapAlbumCover(context, imageView, "Song Cannot Be Found or It Has No ID3v2 Tag!");
+            // Image Downloaded using Retrofit 2.0 and AsyncTask
+            new ImageDownloader(imageView).execute(imageStringUrl); // Used by Async Task
+            //fetchAlbumCoverFromInternet(SortUtility.getRandomIntegerBetweenMinAndMaxValuesRange(1, 5000));
+            //setUpDefaultBitmapAlbumCover(context, imageView, "Song Cannot Be Found or It Has No ID3v2 Tag!");
         }
     }
 
