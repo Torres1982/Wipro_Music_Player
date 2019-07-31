@@ -147,7 +147,6 @@ class MusicTagger {
     }
 }
 
-
 // **************************************** ID3v1Tag ***************************************
 //        if (song != null && song.hasId3v1Tag()) {
 //                Log.i(Constants.LogTags.MUSIC_TAG, "Song Has ID3v1 TAG:");
