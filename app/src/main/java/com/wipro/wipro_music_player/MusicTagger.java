@@ -28,64 +28,64 @@ import retrofit2.Response;
 
 class MusicTagger {
     private static Mp3File song = null;
-    private static String imageStringUrl;
+    //private static String imageStringUrl;
 
-    private static class ImageDownloader extends AsyncTask<String, Void, Bitmap> {
-        private final WeakReference<ImageView> imageView;
-
-        ImageDownloader(ImageView imageView) {
-            this.imageView = new WeakReference<>(imageView);
-        }
-
-        @Override
-        protected Bitmap doInBackground(String... strings) {
-            try {
-                URL url = new URL(strings[0]);
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setDoInput(true);
-                connection.connect();
-                InputStream input = connection.getInputStream();
-                Log.i(Constants.LogTags.MUSIC_TAG, "Input Stream Connection SUCCESS!");
-                return BitmapFactory.decodeStream(input);
-            } catch (IOException e) {
-                Log.i(Constants.LogTags.MUSIC_TAG, "I/O Exception while opening Stream Connection!");
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-
-            if (imageView.get() != null) {
-                imageView.get().setImageBitmap(bitmap);
-            }
-        }
-    }
+//    private static class ImageDownloader extends AsyncTask<String, Void, Bitmap> {
+//        private final WeakReference<ImageView> imageView;
+//
+//        ImageDownloader(ImageView imageView) {
+//            this.imageView = new WeakReference<>(imageView);
+//        }
+//
+//        @Override
+//        protected Bitmap doInBackground(String... strings) {
+//            try {
+//                URL url = new URL(strings[0]);
+//                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//                connection.setDoInput(true);
+//                connection.connect();
+//                InputStream input = connection.getInputStream();
+//                Log.i(Constants.LogTags.MUSIC_TAG, "Input Stream Connection SUCCESS!");
+//                return BitmapFactory.decodeStream(input);
+//            } catch (IOException e) {
+//                Log.i(Constants.LogTags.MUSIC_TAG, "I/O Exception while opening Stream Connection!");
+//                return null;
+//            }
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Bitmap bitmap) {
+//            super.onPostExecute(bitmap);
+//
+//            if (imageView.get() != null) {
+//                imageView.get().setImageBitmap(bitmap);
+//            }
+//        }
+//    }
 
     // Handles downloads of Image URL from the Internet using Retrofit 2.0 API
-    private static String fetchAlbumCoverFromInternet(int albumCoverId) {
-        Call<AlbumCover> serviceCall = RetrofitUtility.getRetrofitServiceCall().getAlbumCover(albumCoverId);
-
-        serviceCall.enqueue(new Callback<AlbumCover>() {
-            @Override
-            public void onResponse(@NonNull Call<AlbumCover> call, @NonNull Response<AlbumCover> response) {
-                if (response.isSuccessful()) {
-                    assert response.body() != null;
-                    imageStringUrl = response.body().getThumbnailUrl();
-                    Log.i(Constants.LogTags.MUSIC_TAG, "Responded SUCCESS with a Status Code " + response.code() + " " + imageStringUrl);
-                } else {
-                    Log.i(Constants.LogTags.MUSIC_TAG, "Responded FAIL with a Status Code " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<AlbumCover> call, @NonNull Throwable t) {
-                Log.i(Constants.LogTags.MUSIC_TAG, "Responded FATAL ERROR - on Failure!");
-            }
-        });
-        return imageStringUrl;
-    }
+//    private static String fetchAlbumCoverFromInternet(int albumCoverId) {
+//        Call<AlbumCover> serviceCall = RetrofitUtility.getRetrofitServiceCall().getAlbumCover(albumCoverId);
+//
+//        serviceCall.enqueue(new Callback<AlbumCover>() {
+//            @Override
+//            public void onResponse(@NonNull Call<AlbumCover> call, @NonNull Response<AlbumCover> response) {
+//                if (response.isSuccessful()) {
+//                    assert response.body() != null;
+//                    imageStringUrl = response.body().getThumbnailUrl();
+//                    Log.i(Constants.LogTags.MUSIC_TAG, "Responded SUCCESS with a Status Code " + response.code() + " " + imageStringUrl);
+//                } else {
+//                    Log.i(Constants.LogTags.MUSIC_TAG, "Responded FAIL with a Status Code " + response.code());
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(@NonNull Call<AlbumCover> call, @NonNull Throwable t) {
+//                Log.i(Constants.LogTags.MUSIC_TAG, "Responded FATAL ERROR - on Failure!");
+//            }
+//        });
+//        return imageStringUrl;
+//    }
 
     // Convert bytes array to the Image and set the Album Cover for the given song path
     static void setAlbumCoverFromId3v2Tag(Context context, ImageView imageView, String mp3path) {
@@ -95,8 +95,8 @@ class MusicTagger {
             Log.i(Constants.LogTags.MUSIC_TAG, "Exception Occurred While Reading The mp3 File!");
         }
 
-        imageStringUrl = fetchAlbumCoverFromInternet(SortUtility.getRandomIntegerBetweenMinAndMaxValuesRange(1, 5000));
-        Log.i(Constants.LogTags.MUSIC_TAG, "Image String URL: " + imageStringUrl);
+        //imageStringUrl = fetchAlbumCoverFromInternet(SortUtility.getRandomIntegerBetweenMinAndMaxValuesRange(1, 5000));
+        //Log.i(Constants.LogTags.MUSIC_TAG, "Image String URL: " + imageStringUrl);
 
         if (song != null && song.hasId3v2Tag()) {
             ID3v2 id3v2tag = song.getId3v2Tag();
@@ -114,9 +114,9 @@ class MusicTagger {
             getID3v2TagInformation();
         } else {
             // Image Downloaded using Retrofit 2.0 and AsyncTask
-            new ImageDownloader(imageView).execute(imageStringUrl); // Used by Async Task
+            //new ImageDownloader(imageView).execute(imageStringUrl); // Used by Async Task
             //fetchAlbumCoverFromInternet(SortUtility.getRandomIntegerBetweenMinAndMaxValuesRange(1, 5000));
-            //setUpDefaultBitmapAlbumCover(context, imageView, "Song Cannot Be Found or It Has No ID3v2 Tag!");
+            setUpDefaultBitmapAlbumCover(context, imageView, "Song Cannot Be Found or It Has No ID3v2 Tag!");
         }
     }
 
