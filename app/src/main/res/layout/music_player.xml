@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_twenty"
         android:layout_marginEnd="@dimen/margin_twenty"
-        android:layout_marginTop="@dimen/margin_sixty"
+        android:layout_marginTop="@dimen/margin_ten"
         android:layout_marginBottom="@dimen/margin_twenty"
         android:gravity="center"
         android:textSize="@dimen/text_title_twenty_two"
@@ -195,7 +195,7 @@
         android:text="@string/footer_text"
         android:textSize="@dimen/text_eighteen"
         android:textColor="@color/red"
-        android:layout_marginTop="@dimen/margin_sixty"
+        android:layout_marginTop="@dimen/margin_forty"
         app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/switch_repeat" />
